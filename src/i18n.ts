@@ -16,6 +16,9 @@ type MessageKey =
   | "delete"
   | "emptyNotes"
   | "emptyTodos"
+  | "loading"
+  | "loadError"
+  | "completedStatus"
   | "markDone"
   | "markUndone"
   | "clearDone"
@@ -47,6 +50,9 @@ const messages: Record<LocaleCode, Record<MessageKey, string>> = {
     delete: "削除",
     emptyNotes: "まだメモはありません。",
     emptyTodos: "今日のやることはありません。",
+    loading: "読み込み中です。",
+    loadError: "読み込みに失敗しました。",
+    completedStatus: "完了",
     markDone: "できた",
     markUndone: "戻す",
     clearDone: "できた項目を消す",
@@ -77,6 +83,9 @@ const messages: Record<LocaleCode, Record<MessageKey, string>> = {
     delete: "Delete",
     emptyNotes: "No notes yet.",
     emptyTodos: "No to-dos for today.",
+    loading: "Loading.",
+    loadError: "Could not load.",
+    completedStatus: "Done",
     markDone: "Done",
     markUndone: "Undo",
     clearDone: "Clear done",
