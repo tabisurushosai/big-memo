@@ -102,11 +102,7 @@ const messages: Record<LocaleCode, Record<MessageKey, string>> = {
   },
 };
 
-export function detectLocale(): LocaleCode {
-  const language =
-    typeof chrome !== "undefined" && chrome.i18n?.getUILanguage
-      ? chrome.i18n.getUILanguage()
-      : navigator.language;
+export function detectLocale(language: string): LocaleCode {
   return language.toLowerCase().startsWith("en") ? "en" : "ja";
 }
 
