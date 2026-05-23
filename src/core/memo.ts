@@ -4,6 +4,12 @@ import type { AppData, Note, PremiumState, Todo } from "./models";
 const MAX_NOTE_LENGTH = 500;
 const MAX_TODO_LENGTH = 160;
 
+type RandomIdSource = {
+  crypto?: {
+    randomUUID?: () => string;
+  };
+};
+
 export function createEmptyData(now: Date = new Date()): AppData {
   return {
     notes: [],
@@ -167,7 +173,7 @@ function normalizeText(text: string, maxLength: number): string {
 
 function createId(prefix: string, now: Date): string {
   const random =
-    globalThis.crypto?.randomUUID?.() ??
+    (globalThis as RandomIdSource).crypto?.randomUUID?.() ??
     Math.random().toString(36).slice(2, 10);
   return `${prefix}-${now.getTime()}-${random}`;
 }

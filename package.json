@@ -4,8 +4,8 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "tsc --noEmit && vite build",
-    "typecheck": "tsc --noEmit"
+    "build": "tsc -p tsconfig.core.json && tsc --noEmit && vite build",
+    "typecheck": "tsc -p tsconfig.core.json && tsc --noEmit"
   },
   "devDependencies": {
     "@types/chrome": "^0.1.42",
