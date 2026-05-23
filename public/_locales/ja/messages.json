@@ -1,0 +1,10 @@
+{
+  "extName": {
+    "message": "おおきなメモ",
+    "description": "拡張機能名"
+  },
+  "extDescription": {
+    "message": "家族が書いた大きな文字のメモと今日のやることを表示します。",
+    "description": "Chrome Web Store向け説明"
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "extName": {
+    "message": "Big Memo",
+    "description": "Extension name"
+  },
+  "extDescription": {
+    "message": "Shows large-text notes and today's to-dos written by family members.",
+    "description": "Chrome Web Store description"
+  }
+}
