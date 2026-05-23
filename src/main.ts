@@ -16,13 +16,14 @@ import {
   getTrialStatus,
   isPaymentLinkConfigured,
 } from "./core/premium";
+import { createTranslator, detectLocale } from "./i18n";
+import { getBrowserLanguage } from "./platform/browserLanguage";
 import { AppRepository } from "./storage/appRepository";
 import { chromeAppStorage } from "./storage/chromeStorage";
-import { createTranslator, detectLocale } from "./i18n";
 
 const app = document.querySelector<HTMLDivElement>("#app");
 const repository = new AppRepository(chromeAppStorage);
-const locale = detectLocale();
+const locale = detectLocale(getBrowserLanguage());
 const t = createTranslator(locale);
 
 let data: AppData;
