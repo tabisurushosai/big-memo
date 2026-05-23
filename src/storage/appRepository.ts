@@ -6,7 +6,14 @@ export class AppRepository {
   constructor(private readonly storage: StorageAdapter<Partial<AppData>>) {}
 
   async load(): Promise<AppData> {
-    return normalizeData(await this.storage.load());
+    const stored = await this.storage.load();
+    const data = normalizeData(stored);
+
+    if (!stored?.premium?.firstLaunchAt) {
+      await this.save(data);
+    }
+
+    return data;
   }
 
   async save(data: AppData): Promise<void> {
