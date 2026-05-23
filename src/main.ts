@@ -44,7 +44,8 @@ function renderLoading() {
   app.innerHTML = `
     <section class="panel status-panel" aria-busy="true">
       <p class="eyebrow">${t("appTitle")}</p>
-      <p class="empty">${t("loading")}</p>
+      <h1>${t("loading")}</h1>
+      <div class="loading-bar" aria-hidden="true"></div>
     </section>
   `;
 }
@@ -71,6 +72,7 @@ function render() {
   const todayTodos = getTodaysTodos(data);
   const trialStatus = getTrialStatus(data.premium);
   const completedTodoCount = todayTodos.filter((todo) => todo.done).length;
+  const remainingTodoCount = todayTodos.length - completedTodoCount;
 
   app.innerHTML = `
     <section class="hero">
@@ -79,18 +81,30 @@ function render() {
         <h1>${t("appTitle")}</h1>
         <p class="subtitle">${t("subtitle")}</p>
       </div>
+      <div class="summary-grid" aria-label="${t("summaryLabel")}">
+        ${renderSummaryItem(t("notesCountLabel"), data.notes.length)}
+        ${renderSummaryItem(t("remainingTodosLabel"), remainingTodoCount)}
+        ${renderSummaryItem(t("completedTodosLabel"), completedTodoCount)}
+      </div>
     </section>
 
     <section class="panel" aria-labelledby="notes-heading">
-      <h2 id="notes-heading">${t("notesTitle")}</h2>
+      <div class="section-title">
+        <p class="eyebrow panel-eyebrow">${t("notesCountLabel")} ${data.notes.length}</p>
+        <h2 id="notes-heading">${t("notesTitle")}</h2>
+      </div>
       <div class="stack" data-notes></div>
     </section>
 
     <section class="panel" aria-labelledby="todos-heading">
       <div class="section-header">
-        <h2 id="todos-heading">${t("todosTitle")}</h2>
+        <div class="section-title">
+          <p class="eyebrow panel-eyebrow">${t("todoProgress", { done: completedTodoCount, total: todayTodos.length, remaining: remainingTodoCount })}</p>
+          <h2 id="todos-heading">${t("todosTitle")}</h2>
+        </div>
         <button class="secondary small" data-action="clear-done" ${completedTodoCount === 0 ? "disabled" : ""}>${t("clearDone")}</button>
       </div>
+      ${todayTodos.length > 0 && remainingTodoCount === 0 ? `<p class="done-message">${t("allTodosDone")}</p>` : ""}
       <div class="stack" data-todos></div>
     </section>
 
@@ -131,7 +145,7 @@ function renderNotes() {
   }
 
   if (data.notes.length === 0) {
-    container.innerHTML = `<p class="empty">${t("emptyNotes")}</p>`;
+    container.innerHTML = renderEmptyState(t("emptyNotes"), t("emptyNotesDetail"));
     return;
   }
 
@@ -169,7 +183,7 @@ function renderTodos(todayTodos: Todo[]) {
   }
 
   if (todayTodos.length === 0) {
-    container.innerHTML = `<p class="empty">${t("emptyTodos")}</p>`;
+    container.innerHTML = renderEmptyState(t("emptyTodos"), t("emptyTodosDetail"));
     return;
   }
 
@@ -293,6 +307,24 @@ function getPremiumMessage(status: ReturnType<typeof getTrialStatus>): string {
     return t("trialActive", { days: status.remainingDays });
   }
   return t("trialEnded");
+}
+
+function renderSummaryItem(label: string, value: number): string {
+  return `
+    <div class="summary-item">
+      <span class="summary-value">${value}</span>
+      <span class="summary-label">${label}</span>
+    </div>
+  `;
+}
+
+function renderEmptyState(title: string, detail: string): string {
+  return `
+    <div class="empty-state">
+      <p class="empty-title">${title}</p>
+      <p class="empty-detail">${detail}</p>
+    </div>
+  `;
 }
 
 function escapeHtml(value: string): string {

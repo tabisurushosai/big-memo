@@ -15,10 +15,18 @@ type MessageKey =
   | "cancel"
   | "delete"
   | "emptyNotes"
+  | "emptyNotesDetail"
   | "emptyTodos"
+  | "emptyTodosDetail"
   | "loading"
   | "loadError"
   | "completedStatus"
+  | "summaryLabel"
+  | "notesCountLabel"
+  | "remainingTodosLabel"
+  | "completedTodosLabel"
+  | "todoProgress"
+  | "allTodosDone"
   | "markDone"
   | "markUndone"
   | "clearDone"
@@ -49,10 +57,18 @@ const messages: Record<LocaleCode, Record<MessageKey, string>> = {
     cancel: "やめる",
     delete: "削除",
     emptyNotes: "まだメモはありません。",
+    emptyNotesDetail: "家族が書き込む欄から、見せたいメモを追加できます。",
     emptyTodos: "今日のやることはありません。",
+    emptyTodosDetail: "今日だけ表示したい予定や用事を追加できます。",
     loading: "読み込み中です。",
     loadError: "読み込みに失敗しました。",
     completedStatus: "完了",
+    summaryLabel: "今日の状況",
+    notesCountLabel: "メモ",
+    remainingTodosLabel: "残り",
+    completedTodosLabel: "完了",
+    todoProgress: "{done} / {total} 完了。残り {remaining} 件です。",
+    allTodosDone: "今日のやることはすべて完了です。",
     markDone: "できた",
     markUndone: "戻す",
     clearDone: "できた項目を消す",
@@ -82,10 +98,18 @@ const messages: Record<LocaleCode, Record<MessageKey, string>> = {
     cancel: "Cancel",
     delete: "Delete",
     emptyNotes: "No notes yet.",
+    emptyNotesDetail: "Use the family editor to add a note to show here.",
     emptyTodos: "No to-dos for today.",
+    emptyTodosDetail: "Add appointments or tasks that should appear today.",
     loading: "Loading.",
     loadError: "Could not load.",
     completedStatus: "Done",
+    summaryLabel: "Today's status",
+    notesCountLabel: "Notes",
+    remainingTodosLabel: "Left",
+    completedTodosLabel: "Done",
+    todoProgress: "{done} / {total} done. {remaining} left.",
+    allTodosDone: "All of today's to-dos are done.",
     markDone: "Done",
     markUndone: "Undo",
     clearDone: "Clear done",
