@@ -35,6 +35,7 @@ textarea {
 
 button {
   min-height: 52px;
+  min-width: 52px;
   border: 2px solid transparent;
   border-radius: 16px;
   padding: 0.75rem 1rem;
@@ -62,8 +63,9 @@ button:disabled {
 button:focus-visible,
 input:focus-visible,
 textarea:focus-visible {
-  outline: 4px solid #ffcc4d;
-  outline-offset: 3px;
+  outline: 3px solid #ffffff;
+  outline-offset: 2px;
+  box-shadow: 0 0 0 6px #0a5bd7;
 }
 
 button.secondary {
@@ -85,8 +87,8 @@ button.danger:hover:not(:disabled) {
 }
 
 button.small {
-  min-height: 44px;
-  padding: 0.55rem 0.8rem;
+  min-height: 48px;
+  padding: 0.65rem 0.85rem;
   font-size: 0.95rem;
 }
 
@@ -277,7 +279,7 @@ h2 {
 .actions {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 0.6rem;
+  gap: 0.75rem;
 }
 
 .editor {
