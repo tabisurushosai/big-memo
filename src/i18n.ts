@@ -44,20 +44,20 @@ type MessageKey =
 const messages: Record<LocaleCode, Record<MessageKey, string>> = {
   ja: {
     appTitle: "おおきなメモ",
-    subtitle: "家族が書いた大きな文字のメモと、今日のやることを表示します。",
+    subtitle: "家族が書いた大きな文字のメモと、今日のやることを見やすく表示します。",
     notesTitle: "今日のメモ",
     todosTitle: "今日のやること",
-    familyEditor: "家族が書き込む",
-    noteLabel: "伝えたいメモ",
+    familyEditor: "家族用の入力欄",
+    noteLabel: "表示するメモ",
     todoLabel: "今日のやること",
     addNote: "メモを追加",
     addTodo: "やることを追加",
-    edit: "直す",
+    edit: "編集",
     save: "保存",
-    cancel: "やめる",
+    cancel: "キャンセル",
     delete: "削除",
     emptyNotes: "まだメモはありません。",
-    emptyNotesDetail: "家族が書き込む欄から、見せたいメモを追加できます。",
+    emptyNotesDetail: "家族用の入力欄から、表示したいメモを追加できます。",
     emptyTodos: "今日のやることはありません。",
     emptyTodosDetail: "今日だけ表示したい予定や用事を追加できます。",
     loading: "読み込み中です。",
@@ -67,29 +67,29 @@ const messages: Record<LocaleCode, Record<MessageKey, string>> = {
     notesCountLabel: "メモ",
     remainingTodosLabel: "残り",
     completedTodosLabel: "完了",
-    todoProgress: "{done} / {total} 完了。残り {remaining} 件です。",
+    todoProgress: "{done} / {total} 完了。残り {remaining}件です。",
     allTodosDone: "今日のやることはすべて完了です。",
-    markDone: "できた",
-    markUndone: "戻す",
-    clearDone: "できた項目を消す",
-    premiumTitle: "Premium",
-    premiumActive: "Premium は有効です。",
+    markDone: "完了にする",
+    markUndone: "未完了に戻す",
+    clearDone: "完了した項目を削除",
+    premiumTitle: "プレミアム",
+    premiumActive: "プレミアムが有効です。",
     trialActive: "7日トライアル中です。残り {days} 日。",
     trialEnded: "7日トライアルは終了しました。",
     basicStillWorks: "トライアル後も、基本のメモと今日のやることは使えます。",
-    paymentUnavailable: "Stripe本番リンクは未設定です。",
-    price: "買い切り $3",
+    paymentUnavailable: "決済リンクは未設定です。",
+    price: "買い切り {price}",
     today: "今日",
-    storageOnly: "内容はこのブラウザの保存領域だけに保存されます。",
-    offline: "ネットワーク送信はありません。",
+    storageOnly: "内容はこの端末の保存領域だけに保存されます。",
+    offline: "ネットワークには送信しません。",
   },
   en: {
     appTitle: "Big Memo",
-    subtitle: "Shows large-text notes and today's to-dos written by family members.",
+    subtitle: "Displays large, easy-to-read notes and today's to-dos written by family.",
     notesTitle: "Today's notes",
     todosTitle: "Today's to-dos",
-    familyEditor: "Family editor",
-    noteLabel: "Note to show",
+    familyEditor: "Family input",
+    noteLabel: "Note to display",
     todoLabel: "Today's to-do",
     addNote: "Add note",
     addTodo: "Add to-do",
@@ -98,32 +98,74 @@ const messages: Record<LocaleCode, Record<MessageKey, string>> = {
     cancel: "Cancel",
     delete: "Delete",
     emptyNotes: "No notes yet.",
-    emptyNotesDetail: "Use the family editor to add a note to show here.",
+    emptyNotesDetail: "Use the family input area to add a note to display here.",
     emptyTodos: "No to-dos for today.",
     emptyTodosDetail: "Add appointments or tasks that should appear today.",
     loading: "Loading.",
-    loadError: "Could not load.",
-    completedStatus: "Done",
+    loadError: "Could not load data.",
+    completedStatus: "Completed",
     summaryLabel: "Today's status",
     notesCountLabel: "Notes",
-    remainingTodosLabel: "Left",
-    completedTodosLabel: "Done",
-    todoProgress: "{done} / {total} done. {remaining} left.",
-    allTodosDone: "All of today's to-dos are done.",
-    markDone: "Done",
-    markUndone: "Undo",
-    clearDone: "Clear done",
+    remainingTodosLabel: "Remaining",
+    completedTodosLabel: "Completed",
+    todoProgress: "{done} of {total} completed. {remaining} remaining.",
+    allTodosDone: "Everything for today is complete.",
+    markDone: "Mark done",
+    markUndone: "Mark not done",
+    clearDone: "Clear completed",
     premiumTitle: "Premium",
     premiumActive: "Premium is active.",
-    trialActive: "7-day trial is active. {days} days left.",
+    trialActive: "Your 7-day trial is active. {days} days remaining.",
     trialEnded: "The 7-day trial has ended.",
     basicStillWorks: "Basic notes and today's to-dos still work after the trial.",
-    paymentUnavailable: "Stripe production link is not configured.",
-    price: "One-time $3",
+    paymentUnavailable: "Payment link is not configured.",
+    price: "One-time purchase: {price}",
     today: "Today",
-    storageOnly: "Content is stored only in this browser's storage.",
-    offline: "No network transmission.",
+    storageOnly: "Content is saved only to this device's storage.",
+    offline: "Nothing is sent over the network.",
   },
+};
+
+const LOCALE_TAGS: Record<LocaleCode, string> = {
+  ja: "ja-JP",
+  en: "en-US",
+};
+
+const INTEGER_FORMATTERS: Record<LocaleCode, Intl.NumberFormat> = {
+  ja: new Intl.NumberFormat(LOCALE_TAGS.ja, { maximumFractionDigits: 0 }),
+  en: new Intl.NumberFormat(LOCALE_TAGS.en, { maximumFractionDigits: 0 }),
+};
+
+const USD_FORMATTERS: Record<LocaleCode, Intl.NumberFormat> = {
+  ja: new Intl.NumberFormat(LOCALE_TAGS.ja, {
+    style: "currency",
+    currency: "USD",
+    currencyDisplay: "narrowSymbol",
+    maximumFractionDigits: 0,
+  }),
+  en: new Intl.NumberFormat(LOCALE_TAGS.en, {
+    style: "currency",
+    currency: "USD",
+    currencyDisplay: "narrowSymbol",
+    maximumFractionDigits: 0,
+  }),
+};
+
+const TODAY_DATE_FORMATTERS: Record<LocaleCode, Intl.DateTimeFormat> = {
+  ja: new Intl.DateTimeFormat(LOCALE_TAGS.ja, {
+    timeZone: "Asia/Tokyo",
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+    weekday: "short",
+  }),
+  en: new Intl.DateTimeFormat(LOCALE_TAGS.en, {
+    timeZone: "Asia/Tokyo",
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+    weekday: "short",
+  }),
 };
 
 export function detectLocale(language: string): LocaleCode {
@@ -134,8 +176,22 @@ export function createTranslator(locale: LocaleCode) {
   return (key: MessageKey, values: Record<string, string | number> = {}) => {
     let message = messages[locale][key];
     for (const [name, value] of Object.entries(values)) {
-      message = message.replace(`{${name}}`, String(value));
+      const formattedValue =
+        typeof value === "number" ? formatInteger(locale, value) : value;
+      message = message.replaceAll(`{${name}}`, formattedValue);
     }
     return message;
   };
+}
+
+export function formatInteger(locale: LocaleCode, value: number): string {
+  return INTEGER_FORMATTERS[locale].format(value);
+}
+
+export function formatUsd(locale: LocaleCode, value: number): string {
+  return USD_FORMATTERS[locale].format(value);
+}
+
+export function formatTodayDate(locale: LocaleCode, date: Date): string {
+  return TODAY_DATE_FORMATTERS[locale].format(date);
 }

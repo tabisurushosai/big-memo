@@ -16,7 +16,13 @@ import {
   getTrialStatus,
   isPaymentLinkConfigured,
 } from "./core/premium";
-import { createTranslator, detectLocale } from "./i18n";
+import {
+  createTranslator,
+  detectLocale,
+  formatInteger,
+  formatTodayDate,
+  formatUsd,
+} from "./i18n";
 import { getBrowserLanguage } from "./platform/browserLanguage";
 import { AppRepository } from "./storage/appRepository";
 import { chromeAppStorage } from "./storage/chromeStorage";
@@ -70,28 +76,32 @@ function render() {
     return;
   }
 
-  const todayTodos = getTodaysTodos(data);
-  const trialStatus = getTrialStatus(data.premium);
+  const now = new Date();
+  const todayTodos = getTodaysTodos(data, now);
+  const trialStatus = getTrialStatus(data.premium, now);
   const completedTodoCount = todayTodos.filter((todo) => todo.done).length;
   const remainingTodoCount = todayTodos.length - completedTodoCount;
+  const noteCountText = formatInteger(locale, data.notes.length);
+  const remainingTodoCountText = formatInteger(locale, remainingTodoCount);
+  const completedTodoCountText = formatInteger(locale, completedTodoCount);
 
   app.innerHTML = `
     <section class="hero">
       <div>
-        <p class="eyebrow">${t("today")}</p>
+        <p class="eyebrow">${t("today")} ${formatTodayDate(locale, now)}</p>
         <h1>${t("appTitle")}</h1>
         <p class="subtitle">${t("subtitle")}</p>
       </div>
       <div class="summary-grid" aria-label="${t("summaryLabel")}">
-        ${renderSummaryItem(t("notesCountLabel"), data.notes.length)}
-        ${renderSummaryItem(t("remainingTodosLabel"), remainingTodoCount)}
-        ${renderSummaryItem(t("completedTodosLabel"), completedTodoCount)}
+        ${renderSummaryItem(t("notesCountLabel"), noteCountText)}
+        ${renderSummaryItem(t("remainingTodosLabel"), remainingTodoCountText)}
+        ${renderSummaryItem(t("completedTodosLabel"), completedTodoCountText)}
       </div>
     </section>
 
     <section class="panel" aria-labelledby="notes-heading">
       <div class="section-title">
-        <p class="eyebrow panel-eyebrow">${t("notesCountLabel")} ${data.notes.length}</p>
+        <p class="eyebrow panel-eyebrow">${t("notesCountLabel")} ${noteCountText}</p>
         <h2 id="notes-heading">${t("notesTitle")}</h2>
       </div>
       <div class="stack" data-notes></div>
@@ -126,7 +136,7 @@ function render() {
 
     <section class="panel premium" aria-labelledby="premium-heading">
       <h2 id="premium-heading">${t("premiumTitle")}</h2>
-      <p class="price">${t("price", { price: PREMIUM_PRICE_USD })}</p>
+      <p class="price">${t("price", { price: formatUsd(locale, PREMIUM_PRICE_USD) })}</p>
       <p>${getPremiumMessage(trialStatus)}</p>
       <p>${t("basicStillWorks")}</p>
       <p>${isPaymentLinkConfigured() ? "" : t("paymentUnavailable")}</p>
@@ -332,7 +342,7 @@ function getPremiumMessage(status: ReturnType<typeof getTrialStatus>): string {
   return t("trialEnded");
 }
 
-function renderSummaryItem(label: string, value: number): string {
+function renderSummaryItem(label: string, value: string): string {
   return `
     <div class="summary-item">
       <span class="summary-value">${value}</span>
