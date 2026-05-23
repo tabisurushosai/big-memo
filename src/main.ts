@@ -29,6 +29,7 @@ const t = createTranslator(locale);
 let data: AppData;
 let editingNoteId: string | null = null;
 let editingTodoId: string | null = null;
+let pendingFocusSelector: string | null = null;
 
 async function initialize() {
   renderLoading();
@@ -136,6 +137,7 @@ function render() {
   renderNotes();
   renderTodos(todayTodos);
   bindActions();
+  focusPendingElement();
 }
 
 function renderNotes() {
@@ -145,18 +147,22 @@ function renderNotes() {
   }
 
   if (data.notes.length === 0) {
+    container.removeAttribute("role");
+    container.removeAttribute("aria-label");
     container.innerHTML = renderEmptyState(t("emptyNotes"), t("emptyNotesDetail"));
     return;
   }
 
+  container.setAttribute("role", "list");
+  container.setAttribute("aria-label", t("notesTitle"));
   container.innerHTML = data.notes.map(renderNote).join("");
 }
 
 function renderNote(note: Note): string {
   if (editingNoteId === note.id) {
     return `
-      <article class="card">
-        <textarea class="edit-field" data-note-edit="${escapeHtml(note.id)}" rows="4" maxlength="500">${escapeHtml(note.text)}</textarea>
+      <article class="card" role="listitem">
+        <textarea class="edit-field" data-note-edit="${escapeHtml(note.id)}" rows="4" maxlength="500" aria-label="${escapeHtml(t("noteLabel"))}">${escapeHtml(note.text)}</textarea>
         <div class="actions">
           <button data-action="save-note" data-id="${escapeHtml(note.id)}">${t("save")}</button>
           <button class="secondary" data-action="cancel-edit">${t("cancel")}</button>
@@ -166,11 +172,11 @@ function renderNote(note: Note): string {
   }
 
   return `
-    <article class="card">
+    <article class="card" role="listitem">
       <p class="large-text">${escapeHtml(note.text)}</p>
       <div class="actions">
-        <button class="secondary" data-action="edit-note" data-id="${escapeHtml(note.id)}">${t("edit")}</button>
-        <button class="danger" data-action="delete-note" data-id="${escapeHtml(note.id)}">${t("delete")}</button>
+        <button class="secondary" data-action="edit-note" data-id="${escapeHtml(note.id)}" aria-label="${escapeHtml(createActionLabel(t("edit"), note.text))}">${t("edit")}</button>
+        <button class="danger" data-action="delete-note" data-id="${escapeHtml(note.id)}" aria-label="${escapeHtml(createActionLabel(t("delete"), note.text))}">${t("delete")}</button>
       </div>
     </article>
   `;
@@ -183,18 +189,22 @@ function renderTodos(todayTodos: Todo[]) {
   }
 
   if (todayTodos.length === 0) {
+    container.removeAttribute("role");
+    container.removeAttribute("aria-label");
     container.innerHTML = renderEmptyState(t("emptyTodos"), t("emptyTodosDetail"));
     return;
   }
 
+  container.setAttribute("role", "list");
+  container.setAttribute("aria-label", t("todosTitle"));
   container.innerHTML = todayTodos.map(renderTodo).join("");
 }
 
 function renderTodo(todo: Todo): string {
   if (editingTodoId === todo.id) {
     return `
-      <article class="card todo-card">
-        <input class="edit-field" data-todo-edit="${escapeHtml(todo.id)}" type="text" maxlength="160" value="${escapeHtml(todo.text)}" />
+      <article class="card todo-card" role="listitem">
+        <input class="edit-field" data-todo-edit="${escapeHtml(todo.id)}" type="text" maxlength="160" value="${escapeHtml(todo.text)}" aria-label="${escapeHtml(t("todoLabel"))}" />
         <div class="actions">
           <button data-action="save-todo" data-id="${escapeHtml(todo.id)}">${t("save")}</button>
           <button class="secondary" data-action="cancel-edit">${t("cancel")}</button>
@@ -205,8 +215,8 @@ function renderTodo(todo: Todo): string {
 
   const doneClass = todo.done ? "done" : "";
   return `
-    <article class="card todo-card ${doneClass}">
-      <button class="check-button" data-action="toggle-todo" data-id="${escapeHtml(todo.id)}" aria-pressed="${todo.done}">
+    <article class="card todo-card ${doneClass}" role="listitem">
+      <button class="check-button" data-action="toggle-todo" data-id="${escapeHtml(todo.id)}" aria-pressed="${todo.done}" aria-label="${escapeHtml(createActionLabel(todo.done ? t("markUndone") : t("markDone"), todo.text))}">
         ${todo.done ? t("markUndone") : t("markDone")}
       </button>
       <div class="todo-content">
@@ -214,8 +224,8 @@ function renderTodo(todo: Todo): string {
         <p class="large-text">${escapeHtml(todo.text)}</p>
       </div>
       <div class="actions">
-        <button class="secondary" data-action="edit-todo" data-id="${escapeHtml(todo.id)}">${t("edit")}</button>
-        <button class="danger" data-action="delete-todo" data-id="${escapeHtml(todo.id)}">${t("delete")}</button>
+        <button class="secondary" data-action="edit-todo" data-id="${escapeHtml(todo.id)}" aria-label="${escapeHtml(createActionLabel(t("edit"), todo.text))}">${t("edit")}</button>
+        <button class="danger" data-action="delete-todo" data-id="${escapeHtml(todo.id)}" aria-label="${escapeHtml(createActionLabel(t("delete"), todo.text))}">${t("delete")}</button>
       </div>
     </article>
   `;
@@ -247,26 +257,29 @@ function bindActions() {
       if (action === "edit-note" && id) {
         editingNoteId = id;
         editingTodoId = null;
+        pendingFocusSelector = `[data-note-edit="${cssEscape(id)}"]`;
         render();
       }
       if (action === "edit-todo" && id) {
         editingTodoId = id;
         editingNoteId = null;
+        pendingFocusSelector = `[data-todo-edit="${cssEscape(id)}"]`;
         render();
       }
       if (action === "save-note" && id) {
         const value = getEditableValue(`[data-note-edit="${cssEscape(id)}"]`);
-        await mutate((current) => updateNote(current, id, value));
         editingNoteId = null;
+        await mutate((current) => updateNote(current, id, value));
       }
       if (action === "save-todo" && id) {
         const value = getEditableValue(`[data-todo-edit="${cssEscape(id)}"]`);
-        await mutate((current) => updateTodo(current, id, value));
         editingTodoId = null;
+        await mutate((current) => updateTodo(current, id, value));
       }
       if (action === "cancel-edit") {
         editingNoteId = null;
         editingTodoId = null;
+        pendingFocusSelector = null;
         render();
       }
       if (action === "clear-done") {
@@ -292,6 +305,16 @@ function clearInput(id: string) {
   if (input) {
     input.value = "";
   }
+}
+
+function focusPendingElement() {
+  if (!pendingFocusSelector) {
+    return;
+  }
+
+  const target = document.querySelector<HTMLElement>(pendingFocusSelector);
+  pendingFocusSelector = null;
+  target?.focus();
 }
 
 function getEditableValue(selector: string): string {
@@ -325,6 +348,10 @@ function renderEmptyState(title: string, detail: string): string {
       <p class="empty-detail">${detail}</p>
     </div>
   `;
+}
+
+function createActionLabel(action: string, text: string): string {
+  return `${action}: ${text}`;
 }
 
 function escapeHtml(value: string): string {
