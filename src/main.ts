@@ -30,8 +30,36 @@ let editingNoteId: string | null = null;
 let editingTodoId: string | null = null;
 
 async function initialize() {
+  renderLoading();
   data = await repository.load();
   render();
+}
+
+function renderLoading() {
+  if (!app) {
+    return;
+  }
+
+  app.innerHTML = `
+    <section class="panel status-panel" aria-busy="true">
+      <p class="eyebrow">${t("appTitle")}</p>
+      <p class="empty">${t("loading")}</p>
+    </section>
+  `;
+}
+
+function renderError(error: unknown) {
+  if (!app) {
+    return;
+  }
+
+  app.innerHTML = `
+    <section class="panel status-panel" role="alert">
+      <p class="eyebrow">${t("appTitle")}</p>
+      <h1>${t("loadError")}</h1>
+      <p class="empty">${escapeHtml(String(error))}</p>
+    </section>
+  `;
 }
 
 function render() {
@@ -41,6 +69,7 @@ function render() {
 
   const todayTodos = getTodaysTodos(data);
   const trialStatus = getTrialStatus(data.premium);
+  const completedTodoCount = todayTodos.filter((todo) => todo.done).length;
 
   app.innerHTML = `
     <section class="hero">
@@ -59,7 +88,7 @@ function render() {
     <section class="panel" aria-labelledby="todos-heading">
       <div class="section-header">
         <h2 id="todos-heading">${t("todosTitle")}</h2>
-        <button class="secondary small" data-action="clear-done">${t("clearDone")}</button>
+        <button class="secondary small" data-action="clear-done" ${completedTodoCount === 0 ? "disabled" : ""}>${t("clearDone")}</button>
       </div>
       <div class="stack" data-todos></div>
     </section>
@@ -162,10 +191,13 @@ function renderTodo(todo: Todo): string {
   const doneClass = todo.done ? "done" : "";
   return `
     <article class="card todo-card ${doneClass}">
-      <button class="check-button" data-action="toggle-todo" data-id="${escapeHtml(todo.id)}">
+      <button class="check-button" data-action="toggle-todo" data-id="${escapeHtml(todo.id)}" aria-pressed="${todo.done}">
         ${todo.done ? t("markUndone") : t("markDone")}
       </button>
-      <p class="large-text">${escapeHtml(todo.text)}</p>
+      <div class="todo-content">
+        ${todo.done ? `<span class="status-badge">${t("completedStatus")}</span>` : ""}
+        <p class="large-text">${escapeHtml(todo.text)}</p>
+      </div>
       <div class="actions">
         <button class="secondary" data-action="edit-todo" data-id="${escapeHtml(todo.id)}">${t("edit")}</button>
         <button class="danger" data-action="delete-todo" data-id="${escapeHtml(todo.id)}">${t("delete")}</button>
@@ -276,7 +308,5 @@ function cssEscape(value: string): string {
 }
 
 initialize().catch((error) => {
-  if (app) {
-    app.innerHTML = `<p class="empty">${escapeHtml(String(error))}</p>`;
-  }
+  renderError(error);
 });
