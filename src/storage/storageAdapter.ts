@@ -11,13 +11,13 @@ export type StorageAdapter<TStored, TWritable = TStored> = {
   save(value: TWritable): Promise<void>;
 };
 
-export function createKeyedStorageAdapter<TStored, TWritable = TStored>(
+export function createKeyedStorageAdapter<TWritable = StorageValue>(
   storage: KeyValueStoragePort,
   key: StorageKey,
-): StorageAdapter<TStored, TWritable> {
+): StorageAdapter<StorageValue, TWritable> {
   return {
     async load() {
-      return (await storage.get(key)) as TStored | undefined;
+      return storage.get(key);
     },
     save(value) {
       return storage.set(key, value);

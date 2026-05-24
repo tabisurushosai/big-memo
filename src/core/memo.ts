@@ -1,5 +1,6 @@
 import { getTodayKey, toIsoString } from "./dates";
-import type { AppData, Note, PremiumState, StoredAppData, Todo } from "./models";
+import { isRecord } from "./guards";
+import type { AppData, Note, PremiumState, Todo } from "./models";
 
 const MAX_NOTE_LENGTH = 500;
 const MAX_TODO_LENGTH = 160;
@@ -12,6 +13,11 @@ type RandomIdSource = {
 
 type EntryBase = Pick<Note, "id" | "text" | "createdAt" | "updatedAt">;
 type EntryPrefix = "note" | "todo";
+type StoredAppData = {
+  notes?: unknown;
+  todos?: unknown;
+  premium?: unknown;
+};
 
 export function createEmptyData(now: Date = new Date()): AppData {
   return {
@@ -24,14 +30,16 @@ export function createEmptyData(now: Date = new Date()): AppData {
 }
 
 export function normalizeData(
-  value: StoredAppData | undefined,
+  value: unknown,
   now: Date = new Date(),
 ): AppData {
   const fallback = createEmptyData(now);
+  const stored: StoredAppData | undefined = isRecord(value) ? value : undefined;
+
   return {
-    notes: Array.isArray(value?.notes) ? value.notes : fallback.notes,
-    todos: Array.isArray(value?.todos) ? value.todos : fallback.todos,
-    premium: normalizePremium(value?.premium, fallback.premium),
+    notes: getStoredList<Note>(stored?.notes, fallback.notes),
+    todos: getStoredList<Todo>(stored?.todos, fallback.todos),
+    premium: normalizePremium(stored?.premium, fallback.premium),
   };
 }
 
@@ -147,17 +155,20 @@ export function clearCompletedTodaysTodos(
 }
 
 function normalizePremium(
-  premium: Partial<PremiumState> | undefined,
+  premium: unknown,
   fallback: PremiumState,
 ): PremiumState {
-  const purchasedAt = premium?.purchasedAt;
+  const firstLaunchAt = isRecord(premium) ? premium["firstLaunchAt"] : undefined;
+  const purchasedAt = isRecord(premium) ? premium["purchasedAt"] : undefined;
 
   return {
-    firstLaunchAt: isValidDateString(premium?.firstLaunchAt)
-      ? premium.firstLaunchAt
-      : fallback.firstLaunchAt,
+    firstLaunchAt: isValidDateString(firstLaunchAt) ? firstLaunchAt : fallback.firstLaunchAt,
     ...(isValidDateString(purchasedAt) ? { purchasedAt } : {}),
   };
+}
+
+function getStoredList<TEntry>(value: unknown, fallback: TEntry[]): TEntry[] {
+  return Array.isArray(value) ? (value as TEntry[]) : fallback;
 }
 
 function normalizeText(text: string, maxLength: number): string {
