@@ -3,10 +3,12 @@ import type { AppData } from "../core/models";
 export const APP_DATA_STORAGE_KEY = "bigMemoAppData";
 
 export type StoredAppData = Partial<AppData>;
+export type StorageKey = string;
+export type StorageValue = unknown;
 
 export type KeyValueStoragePort = {
-  get<TValue>(key: string): Promise<TValue | undefined>;
-  set<TValue>(key: string, value: TValue): Promise<void>;
+  get(key: StorageKey): Promise<StorageValue | undefined>;
+  set(key: StorageKey, value: StorageValue): Promise<void>;
 };
 
 export type StorageAdapter<TStored, TWritable = TStored> = {
@@ -18,11 +20,11 @@ export type AppDataStorageAdapter = StorageAdapter<StoredAppData, AppData>;
 
 export function createKeyedStorageAdapter<TStored, TWritable = TStored>(
   storage: KeyValueStoragePort,
-  key: string,
+  key: StorageKey,
 ): StorageAdapter<TStored, TWritable> {
   return {
-    load() {
-      return storage.get<TStored>(key);
+    async load() {
+      return (await storage.get(key)) as TStored | undefined;
     },
     save(value) {
       return storage.set(key, value);
