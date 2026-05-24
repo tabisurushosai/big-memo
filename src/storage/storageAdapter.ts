@@ -4,25 +4,37 @@ export const APP_DATA_STORAGE_KEY = "bigMemoAppData";
 
 export type StoredAppData = Partial<AppData>;
 
-export type KeyValueStorageAdapter = {
-  load<T>(key: string): Promise<T | undefined>;
-  save<T>(key: string, value: T): Promise<void>;
+export type KeyValueStoragePort = {
+  get<TValue>(key: string): Promise<TValue | undefined>;
+  set<TValue>(key: string, value: TValue): Promise<void>;
 };
 
-export type AppDataStorageAdapter = {
-  load(): Promise<StoredAppData | undefined>;
-  save(value: AppData): Promise<void>;
+export type StorageAdapter<TStored, TWritable = TStored> = {
+  load(): Promise<TStored | undefined>;
+  save(value: TWritable): Promise<void>;
 };
 
-export function createAppDataStorageAdapter(
-  storage: KeyValueStorageAdapter,
-): AppDataStorageAdapter {
+export type AppDataStorageAdapter = StorageAdapter<StoredAppData, AppData>;
+
+export function createKeyedStorageAdapter<TStored, TWritable = TStored>(
+  storage: KeyValueStoragePort,
+  key: string,
+): StorageAdapter<TStored, TWritable> {
   return {
     load() {
-      return storage.load<StoredAppData>(APP_DATA_STORAGE_KEY);
+      return storage.get<TStored>(key);
     },
     save(value) {
-      return storage.save(APP_DATA_STORAGE_KEY, value);
+      return storage.set(key, value);
     },
   };
+}
+
+export function createAppDataStorageAdapter(
+  storage: KeyValueStoragePort,
+): AppDataStorageAdapter {
+  return createKeyedStorageAdapter<StoredAppData, AppData>(
+    storage,
+    APP_DATA_STORAGE_KEY,
+  );
 }
