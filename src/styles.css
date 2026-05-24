@@ -1,5 +1,22 @@
 :root {
-  color: #102236;
+  --color-text: #102236;
+  --color-muted: #52616f;
+  --color-panel: #ffffff;
+  --color-surface: #f7fbff;
+  --color-surface-strong: #eef6ff;
+  --color-border: #adc9e4;
+  --color-border-soft: #c4d5e6;
+  --color-primary: #075ea8;
+  --color-primary-hover: #064f8f;
+  --color-success: #08733f;
+  --color-success-hover: #066234;
+  --color-danger: #a12635;
+  --color-danger-hover: #871e2c;
+  --radius-lg: 24px;
+  --radius-md: 18px;
+  --radius-sm: 16px;
+  --shadow-panel: 0 10px 26px rgb(16 34 54 / 9%);
+  color: var(--color-text);
   background: #eef5fb;
   font-family:
     system-ui,
@@ -39,10 +56,10 @@ button {
   min-height: 52px;
   min-width: 52px;
   border: 2px solid transparent;
-  border-radius: 16px;
+  border-radius: var(--radius-sm);
   padding: 0.75rem 1rem;
   color: #ffffff;
-  background: #075ea8;
+  background: var(--color-primary);
   font-size: 1rem;
   font-weight: 800;
   line-height: 1.2;
@@ -50,7 +67,7 @@ button {
 }
 
 button:hover:not(:disabled) {
-  background: #064f8f;
+  background: var(--color-primary-hover);
 }
 
 button:active:not(:disabled) {
@@ -58,7 +75,7 @@ button:active:not(:disabled) {
 }
 
 button:disabled {
-  color: #52616f;
+  color: var(--color-muted);
   background: #d7e0ea;
   cursor: not-allowed;
 }
@@ -88,11 +105,11 @@ button.secondary:hover:not(:disabled) {
 }
 
 button.danger {
-  background: #a12635;
+  background: var(--color-danger);
 }
 
 button.danger:hover:not(:disabled) {
-  background: #871e2c;
+  background: var(--color-danger-hover);
 }
 
 button.small {
@@ -103,16 +120,16 @@ button.small {
 
 #app {
   display: grid;
-  gap: 1.1rem;
-  padding: 1.1rem;
+  gap: 1.15rem;
+  padding: 1.15rem;
 }
 
 .hero,
 .panel {
-  border: 1px solid #c4d5e6;
-  border-radius: 24px;
-  background: #ffffff;
-  box-shadow: 0 10px 26px rgb(16 34 54 / 9%);
+  border: 1px solid var(--color-border-soft);
+  border-radius: var(--radius-lg);
+  background: var(--color-panel);
+  box-shadow: var(--shadow-panel);
 }
 
 .hero {
@@ -125,7 +142,7 @@ button.small {
 }
 
 .panel {
-  padding: 1.2rem;
+  padding: 1.25rem;
 }
 
 .first-guide {
@@ -147,13 +164,15 @@ button.small {
 
 .status-panel {
   display: grid;
-  gap: 0.8rem;
-  min-height: 9rem;
+  gap: 0.9rem;
+  min-height: 10rem;
   align-content: center;
+  border-color: #9fc9ef;
+  background: var(--color-surface-strong);
 }
 
 .status-panel .eyebrow {
-  color: #52616f;
+  color: var(--color-muted);
 }
 
 .eyebrow {
@@ -166,7 +185,7 @@ button.small {
 }
 
 .panel-eyebrow {
-  color: #52616f;
+  color: var(--color-muted);
   font-size: 0.82rem;
   line-height: 1.35;
 }
@@ -206,7 +225,7 @@ h2 {
 
 .summary-grid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(6.25rem, 1fr));
   gap: 0.6rem;
 }
 
@@ -214,7 +233,7 @@ h2 {
   display: grid;
   gap: 0.1rem;
   border: 1px solid rgb(255 255 255 / 28%);
-  border-radius: 16px;
+  border-radius: var(--radius-sm);
   padding: 0.7rem 0.6rem;
   background: rgb(255 255 255 / 15%);
 }
@@ -241,11 +260,17 @@ h2 {
   align-items: flex-start;
   justify-content: space-between;
   gap: 0.75rem;
-  margin-bottom: 0.75rem;
+  margin-bottom: 0.9rem;
 }
 
 .section-title {
+  display: grid;
+  gap: 0.2rem;
   min-width: 0;
+}
+
+.panel > .section-title {
+  margin-bottom: 0.9rem;
 }
 
 .section-title h2,
@@ -256,10 +281,11 @@ h2 {
 .card {
   display: grid;
   gap: 0.95rem;
-  border: 1px solid #adc9e4;
-  border-radius: 18px;
-  padding: 1.05rem;
-  background: #f7fbff;
+  border: 1px solid var(--color-border);
+  border-left-width: 5px;
+  border-radius: var(--radius-md);
+  padding: 1.05rem 1.1rem;
+  background: var(--color-surface);
 }
 
 .todo-card {
@@ -277,11 +303,11 @@ h2 {
 }
 
 .check-button {
-  background: #08733f;
+  background: var(--color-success);
 }
 
 .check-button:hover:not(:disabled) {
-  background: #066234;
+  background: var(--color-success-hover);
 }
 
 .todo-content {
@@ -292,7 +318,7 @@ h2 {
 .status-badge {
   justify-self: start;
   border-radius: 999px;
-  padding: 0.28rem 0.65rem;
+  padding: 0.32rem 0.7rem;
   color: #123f23;
   background: #c7ebd1;
   font-size: 0.85rem;
@@ -300,10 +326,11 @@ h2 {
 }
 
 .done-message {
-  margin: -0.2rem 0 0.75rem;
+  margin: -0.15rem 0 0.9rem;
   border: 1px solid #8bc79f;
-  border-radius: 16px;
-  padding: 0.8rem 0.9rem;
+  border-left-width: 5px;
+  border-radius: var(--radius-sm);
+  padding: 0.85rem 0.95rem;
   color: #123f23;
   background: #f0faf3;
   font-weight: 800;
@@ -322,10 +349,11 @@ h2 {
 
 .editor-hint {
   margin-bottom: 0;
-  border-radius: 16px;
+  border: 1px solid #c4d5e6;
+  border-radius: var(--radius-sm);
   padding: 0.85rem;
   color: #263f56;
-  background: #f2f8ff;
+  background: var(--color-surface-strong);
   font-weight: 800;
 }
 
@@ -340,8 +368,8 @@ input,
 textarea,
 .edit-field {
   width: 100%;
-  border: 1px solid #9db6cf;
-  border-radius: 16px;
+  border: 2px solid #8eabc7;
+  border-radius: var(--radius-sm);
   padding: 0.95rem;
   color: #102033;
   background: #ffffff;
@@ -361,12 +389,12 @@ textarea {
 
 .empty,
 .quiet {
-  color: #52616f;
+  color: var(--color-muted);
 }
 
 .empty {
   margin-bottom: 0;
-  border-radius: 16px;
+  border-radius: var(--radius-sm);
   padding: 0.85rem;
   background: #f5f8fb;
   font-size: 1.1rem;
@@ -375,10 +403,11 @@ textarea {
 
 .empty-state {
   display: grid;
-  gap: 0.45rem;
-  border: 1px dashed #b7c8d8;
-  border-radius: 18px;
-  padding: 1.05rem;
+  gap: 0.55rem;
+  border: 1px solid #b7c8d8;
+  border-left: 5px solid #7aa9d6;
+  border-radius: var(--radius-md);
+  padding: 1.1rem;
   background: #fbfdff;
 }
 
@@ -391,7 +420,7 @@ textarea {
 
 .empty-detail {
   margin-bottom: 0;
-  color: #52616f;
+  color: var(--color-muted);
   font-weight: 650;
 }
 
@@ -408,7 +437,7 @@ textarea {
   justify-content: center;
   min-height: 52px;
   border: 2px solid #9fc9ef;
-  border-radius: 16px;
+  border-radius: var(--radius-sm);
   padding: 0.7rem 0.9rem;
   color: #0f304d;
   background: #e4f1ff;
@@ -432,8 +461,8 @@ textarea {
 
 .guide-link-primary {
   color: #ffffff;
-  background: #075ea8;
-  border-color: #075ea8;
+  background: var(--color-primary);
+  border-color: var(--color-primary);
 }
 
 .guide-link:hover,
@@ -442,7 +471,7 @@ textarea {
 }
 
 .guide-link-primary:hover {
-  background: #064f8f;
+  background: var(--color-primary-hover);
 }
 
 .loading-bar {
@@ -450,8 +479,9 @@ textarea {
   height: 0.55rem;
   overflow: hidden;
   border-radius: 999px;
+  border: 1px solid #c4d5e6;
   background:
-    linear-gradient(90deg, #d7e8f8 0 28%, #eef5fb 28% 100%);
+    linear-gradient(90deg, var(--color-primary) 0 36%, #d7e8f8 36% 100%);
 }
 
 .premium {
