@@ -1,5 +1,6 @@
 :root {
   --color-text: #102236;
+  --color-text-strong: #0b1f33;
   --color-muted: #465667;
   --color-panel: #ffffff;
   --color-surface: #f7fbff;
@@ -62,7 +63,7 @@ button {
   background: var(--color-primary);
   font-size: 1rem;
   font-weight: 800;
-  line-height: 1.2;
+  line-height: 1.25;
   cursor: pointer;
 }
 
@@ -75,8 +76,9 @@ button:active:not(:disabled) {
 }
 
 button:disabled {
-  color: var(--color-muted);
-  background: #d7e0ea;
+  color: #54606d;
+  background: #e4ebf2;
+  border-color: #c8d4df;
   cursor: not-allowed;
 }
 
@@ -120,8 +122,8 @@ button.small {
 
 #app {
   display: grid;
-  gap: 1.15rem;
-  padding: 1.15rem;
+  gap: 1.2rem;
+  padding: clamp(1rem, 4vw, 1.35rem);
 }
 
 .hero,
@@ -134,15 +136,15 @@ button.small {
 
 .hero {
   display: grid;
-  gap: 1.15rem;
-  padding: 1.35rem;
+  gap: 1.25rem;
+  padding: clamp(1.25rem, 5vw, 1.6rem);
   color: #ffffff;
   background: linear-gradient(135deg, #0f3659 0%, #1c5a88 100%);
   border-color: #0f3659;
 }
 
 .panel {
-  padding: 1.25rem;
+  padding: clamp(1.15rem, 4vw, 1.45rem);
 }
 
 .first-guide {
@@ -173,14 +175,20 @@ button.small {
 .status-panel {
   display: grid;
   gap: 0.9rem;
-  min-height: 10rem;
+  min-height: 11.5rem;
   align-content: center;
   border-color: #9fc9ef;
   background: var(--color-surface-strong);
+  text-align: left;
 }
 
 .status-panel .eyebrow {
   color: var(--color-muted);
+}
+
+.status-panel h1,
+.status-panel p {
+  margin-bottom: 0;
 }
 
 .eyebrow {
@@ -213,8 +221,8 @@ h1 {
 
 h2 {
   margin-bottom: 0.75rem;
-  color: #12324a;
-  font-size: 1.35rem;
+  color: var(--color-text-strong);
+  font-size: 1.42rem;
   line-height: 1.2;
 }
 
@@ -229,12 +237,17 @@ h2 {
   margin-bottom: 0;
   color: #f1f8ff;
   font-weight: 650;
+  max-width: 32rem;
+}
+
+.large-text {
+  margin-bottom: 0;
 }
 
 .summary-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(6.25rem, 1fr));
-  gap: 0.6rem;
+  gap: 0.7rem;
 }
 
 .summary-item {
@@ -242,8 +255,8 @@ h2 {
   gap: 0.1rem;
   border: 1px solid rgb(255 255 255 / 28%);
   border-radius: var(--radius-sm);
-  padding: 0.7rem 0.6rem;
-  background: rgb(255 255 255 / 15%);
+  padding: 0.8rem 0.7rem;
+  background: rgb(255 255 255 / 18%);
 }
 
 .summary-value {
@@ -260,7 +273,7 @@ h2 {
 
 .stack {
   display: grid;
-  gap: 0.75rem;
+  gap: 0.85rem;
 }
 
 .section-header {
@@ -288,11 +301,11 @@ h2 {
 
 .card {
   display: grid;
-  gap: 0.95rem;
+  gap: 1rem;
   border: 1px solid var(--color-border);
   border-left-width: 5px;
   border-radius: var(--radius-md);
-  padding: 1.05rem 1.1rem;
+  padding: 1.15rem;
   background: var(--color-surface);
 }
 
@@ -313,6 +326,7 @@ h2 {
 .todo-card.done .large-text {
   color: #486052;
   text-decoration: line-through;
+  text-decoration-thickness: 0.12em;
 }
 
 .check-button {
@@ -325,17 +339,18 @@ h2 {
 
 .todo-content {
   display: grid;
-  gap: 0.5rem;
+  gap: 0.55rem;
 }
 
 .status-badge {
   justify-self: start;
   border-radius: 999px;
-  padding: 0.32rem 0.7rem;
+  padding: 0.35rem 0.75rem;
   color: #123f23;
   background: #c7ebd1;
   font-size: 0.85rem;
   font-weight: 900;
+  letter-spacing: 0.02em;
 }
 
 .done-message {
@@ -343,7 +358,7 @@ h2 {
   border: 1px solid #8bc79f;
   border-left-width: 5px;
   border-radius: var(--radius-sm);
-  padding: 0.85rem 0.95rem;
+  padding: 0.95rem 1rem;
   color: #123f23;
   background: #f0faf3;
   font-weight: 800;
@@ -357,12 +372,19 @@ h2 {
 
 .editor {
   display: grid;
-  gap: 0.9rem;
+  gap: 1rem;
 }
 
 .entry-form {
   display: grid;
-  gap: 0.55rem;
+  gap: 0.6rem;
+  border-top: 1px solid #dbe8f4;
+  padding-top: 1rem;
+}
+
+.entry-form:first-of-type {
+  border-top: 0;
+  padding-top: 0;
 }
 
 .editor-hint {
@@ -395,6 +417,12 @@ textarea,
   font-size: 1.1rem;
   line-height: 1.45;
   scroll-margin-block: 1rem;
+}
+
+input:focus,
+textarea:focus,
+.edit-field:focus {
+  border-color: var(--color-primary);
 }
 
 input::placeholder,
@@ -430,18 +458,18 @@ textarea {
 
 .empty-state {
   display: grid;
-  gap: 0.55rem;
+  gap: 0.65rem;
   border: 1px solid #b7c8d8;
   border-left: 5px solid #7aa9d6;
   border-radius: var(--radius-md);
-  padding: 1.1rem;
-  background: #fbfdff;
+  padding: 1.2rem;
+  background: linear-gradient(180deg, #ffffff 0%, #f7fbff 100%);
 }
 
 .empty-title {
   margin-bottom: 0;
-  color: #263f56;
-  font-size: 1.1rem;
+  color: var(--color-text-strong);
+  font-size: 1.16rem;
   font-weight: 900;
 }
 
@@ -472,6 +500,10 @@ textarea {
   line-height: 1.25;
   text-align: center;
   text-decoration: none;
+}
+
+.empty-link {
+  justify-self: start;
 }
 
 .sr-only {
@@ -508,7 +540,7 @@ textarea {
   border-radius: 999px;
   border: 1px solid #c4d5e6;
   background:
-    linear-gradient(90deg, var(--color-primary) 0 36%, #d7e8f8 36% 100%);
+    linear-gradient(90deg, var(--color-primary) 0 42%, #d7e8f8 42% 100%);
 }
 
 .premium {
@@ -516,12 +548,35 @@ textarea {
   background: #fff9e8;
 }
 
+.premium h2 {
+  color: #3b2b00;
+}
+
+.premium p {
+  margin-bottom: 0.65rem;
+}
+
+.premium p:last-child {
+  margin-bottom: 0;
+}
+
 .price {
   display: inline-block;
   margin-bottom: 0.5rem;
   border-radius: 999px;
   padding: 0.35rem 0.7rem;
-  color: #4a3100;
+  color: #3b2b00;
   background: #ffe39a;
   font-weight: 900;
+}
+
+@media (min-width: 460px) {
+  .todo-card:has(.check-button):not(.done) {
+    grid-template-columns: minmax(8rem, auto) 1fr;
+    align-items: start;
+  }
+
+  .todo-card:has(.check-button):not(.done) .actions {
+    grid-column: 1 / -1;
+  }
 }
