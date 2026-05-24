@@ -66,10 +66,15 @@ button:disabled {
 button:focus-visible,
 a:focus-visible,
 input:focus-visible,
-textarea:focus-visible {
+textarea:focus-visible,
+.focus-target:focus {
   outline: 3px solid #ffffff;
   outline-offset: 2px;
   box-shadow: 0 0 0 6px #0a5bd7;
+}
+
+.focus-target {
+  scroll-margin-block: 1rem;
 }
 
 button.secondary {
@@ -91,7 +96,7 @@ button.danger:hover:not(:disabled) {
 }
 
 button.small {
-  min-height: 48px;
+  min-height: 52px;
   padding: 0.65rem 0.85rem;
   font-size: 0.95rem;
 }
@@ -333,6 +338,7 @@ textarea,
   background: #ffffff;
   font-size: 1.1rem;
   line-height: 1.45;
+  scroll-margin-block: 1rem;
 }
 
 input::placeholder,
@@ -391,7 +397,7 @@ textarea {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-height: 48px;
+  min-height: 52px;
   border: 2px solid #9fc9ef;
   border-radius: 16px;
   padding: 0.7rem 0.9rem;
@@ -401,6 +407,18 @@ textarea {
   line-height: 1.25;
   text-align: center;
   text-decoration: none;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+  padding: 0;
 }
 
 .guide-link-primary {
