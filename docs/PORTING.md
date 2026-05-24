@@ -20,9 +20,17 @@ The persisted app data key is `bigMemoAppData`. Do not change the key or the
 stored shape without a migration, because existing users already have data in
 that format.
 
+The storage layer has two boundaries:
+
+- `KeyValueStoragePort` is the platform boundary. It exposes key-based `get`
+  and `set` operations and is the only place a platform API should be wrapped.
+- `AppDataStorageAdapter` is the app boundary consumed by `AppRepository`. It
+  loads the existing partial stored shape and saves the normalized `AppData`
+  shape without changing the persisted format.
+
 For a new platform:
 
-1. Implement `KeyValueStorageAdapter` with the platform's local, offline storage
+1. Implement `KeyValueStoragePort` with the platform's local, offline storage
    API.
 2. Wrap it with `createAppDataStorageAdapter`.
 3. Pass the resulting `AppDataStorageAdapter` to `AppRepository`.
@@ -33,7 +41,9 @@ ports can map the same adapter to their local persistence layer while keeping
 
 ## Checks before porting changes
 
-- Run `npm run build`; it includes a core-only typecheck without Chrome types.
+- Run `npm run build`; it includes `tsconfig.portable.json`, which typechecks
+  `src/core/`, `src/storage/storageAdapter.ts`, and
+  `src/storage/appRepository.ts` without Chrome or DOM types.
 - Keep Manifest V3 permissions unchanged for the extension build unless a
   separate, reviewed change explicitly requires otherwise.
 - Do not add remote code, external CDNs, external fonts, network APIs, or `eval`.
