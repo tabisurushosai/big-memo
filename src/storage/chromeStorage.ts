@@ -1,14 +1,15 @@
 import {
   createAppDataStorageAdapter,
   type KeyValueStoragePort,
+  type StorageValue,
 } from "./storageAdapter";
 
 export const chromeLocalStorage: KeyValueStoragePort = {
-  async get<T>(key: string): Promise<T | undefined> {
+  async get(key: string): Promise<StorageValue | undefined> {
     const result = await chrome.storage.local.get(key);
-    return result[key] as T | undefined;
+    return result[key];
   },
-  async set<T>(key: string, value: T): Promise<void> {
+  async set(key: string, value: StorageValue): Promise<void> {
     await chrome.storage.local.set({ [key]: value });
   },
 };
