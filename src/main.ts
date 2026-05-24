@@ -532,7 +532,7 @@ function renderEmptyState(
 }
 
 function createActionLabel(action: string, text: string): string {
-  return `${action}: ${text}`;
+  return t("actionTargetLabel", { action, target: text });
 }
 
 function hasMeaningfulInput(value: string): boolean {
