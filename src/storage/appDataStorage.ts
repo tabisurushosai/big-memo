@@ -11,7 +11,10 @@ export const APP_DATA_STORAGE_KEY = "bigMemoAppData";
 export type AppDataStorageAdapter = StorageAdapter<StorageValue, AppData>;
 
 export function createAppDataStorageAdapter(
-  storage: KeyValueStoragePort,
+  storage: KeyValueStoragePort<StorageValue, AppData>,
 ): AppDataStorageAdapter {
-  return createKeyedStorageAdapter<AppData>(storage, APP_DATA_STORAGE_KEY);
+  return createKeyedStorageAdapter<StorageValue, AppData>(
+    storage,
+    APP_DATA_STORAGE_KEY,
+  );
 }

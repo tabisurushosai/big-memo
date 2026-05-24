@@ -26,9 +26,10 @@ that format.
 The storage layer has two boundaries:
 
 - `KeyValueStoragePort` is the platform boundary. It exposes key-based `get`
-  and `set` operations over `unknown` values and is the only place a platform
-  API should be wrapped. Implementations should stay small and should not
-  interpret app models.
+  and `set` operations and is the only place a platform API should be wrapped.
+  The interface separates the stored value type from the writable value type so
+  app code can load legacy `unknown` data while saving normalized `AppData`.
+  Implementations should stay small and should not interpret app models.
 - `AppDataStorageAdapter` is the app boundary consumed by `AppRepository`. It
   loads the existing partial stored shape and saves the normalized `AppData`
   shape without changing the persisted format. `appDataStorage.ts` is where the
