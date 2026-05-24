@@ -71,7 +71,7 @@ function renderLoading(): void {
   app.innerHTML = `
     <section class="panel status-panel" aria-busy="true">
       <p class="eyebrow">${t("appTitle")}</p>
-      <h1>${t("loading")}</h1>
+      <h1 id="app-heading">${t("loading")}</h1>
       <div class="loading-bar" aria-hidden="true"></div>
     </section>
   `;
@@ -85,7 +85,7 @@ function renderError(error: unknown): void {
   app.innerHTML = `
     <section class="panel status-panel" role="alert">
       <p class="eyebrow">${t("appTitle")}</p>
-      <h1>${t("loadError")}</h1>
+      <h1 id="app-heading">${t("loadError")}</h1>
       <p class="empty">${escapeHtml(String(error))}</p>
     </section>
   `;
@@ -121,10 +121,10 @@ function render(): void {
     <section class="hero">
       <div>
         <p class="eyebrow">${t("todayDateLabel", { date: formatTodayDate(locale, now) })}</p>
-        <h1>${t("appTitle")}</h1>
+        <h1 id="app-heading">${t("appTitle")}</h1>
         <p class="subtitle">${t("subtitle")}</p>
       </div>
-      <div class="summary-grid" aria-label="${t("summaryLabel")}">
+      <div class="summary-grid" role="list" aria-label="${t("summaryLabel")}">
         ${renderSummaryItem(t("notesCountLabel"), noteCountText)}
         ${renderSummaryItem(t("remainingTodosLabel"), remainingTodoCountText)}
         ${renderSummaryItem(t("completedTodosLabel"), completedTodoCountText)}
@@ -219,10 +219,12 @@ function renderNotes(): void {
 
 function renderNote(note: Note): string {
   if (editingNoteId === note.id) {
+    const editHelpId = `note-edit-help-${note.id}`;
     return `
       <article class="card" role="listitem">
-        <textarea class="edit-field" data-note-edit="${escapeHtml(note.id)}" rows="4" maxlength="500" aria-label="${escapeHtml(t("noteLabel"))}">${escapeHtml(note.text)}</textarea>
-        <div class="actions">
+        <textarea class="edit-field" data-note-edit="${escapeHtml(note.id)}" rows="4" maxlength="500" aria-label="${escapeHtml(t("noteLabel"))}" aria-describedby="${escapeHtml(editHelpId)}">${escapeHtml(note.text)}</textarea>
+        <p id="${escapeHtml(editHelpId)}" class="sr-only">${t("editKeyboardHelp")}</p>
+        <div class="actions" role="group" aria-label="${escapeHtml(t("editActionsLabel"))}">
           <button data-action="save-note" data-id="${escapeHtml(note.id)}">${t("save")}</button>
           <button class="secondary" data-action="cancel-edit">${t("cancel")}</button>
         </div>
@@ -233,7 +235,7 @@ function renderNote(note: Note): string {
   return `
     <article class="card" role="listitem">
       <p class="large-text">${escapeHtml(note.text)}</p>
-      <div class="actions">
+      <div class="actions" role="group" aria-label="${escapeHtml(t("noteActionsLabel"))}">
         <button class="secondary" data-action="edit-note" data-id="${escapeHtml(note.id)}" aria-label="${escapeHtml(createActionLabel(t("edit"), note.text))}">${t("edit")}</button>
         <button class="danger" data-action="delete-note" data-id="${escapeHtml(note.id)}" aria-label="${escapeHtml(createActionLabel(t("delete"), note.text))}">${t("delete")}</button>
       </div>
@@ -266,10 +268,12 @@ function renderTodos(todayTodos: Todo[]): void {
 
 function renderTodo(todo: Todo): string {
   if (editingTodoId === todo.id) {
+    const editHelpId = `todo-edit-help-${todo.id}`;
     return `
       <article class="card todo-card" role="listitem">
-        <input class="edit-field" data-todo-edit="${escapeHtml(todo.id)}" type="text" maxlength="160" value="${escapeHtml(todo.text)}" aria-label="${escapeHtml(t("todoLabel"))}" />
-        <div class="actions">
+        <input class="edit-field" data-todo-edit="${escapeHtml(todo.id)}" type="text" maxlength="160" value="${escapeHtml(todo.text)}" aria-label="${escapeHtml(t("todoLabel"))}" aria-describedby="${escapeHtml(editHelpId)}" />
+        <p id="${escapeHtml(editHelpId)}" class="sr-only">${t("editKeyboardHelp")}</p>
+        <div class="actions" role="group" aria-label="${escapeHtml(t("editActionsLabel"))}">
           <button data-action="save-todo" data-id="${escapeHtml(todo.id)}">${t("save")}</button>
           <button class="secondary" data-action="cancel-edit">${t("cancel")}</button>
         </div>
@@ -287,7 +291,7 @@ function renderTodo(todo: Todo): string {
         ${todo.done ? `<span class="status-badge">${t("completedStatus")}</span>` : ""}
         <p class="large-text">${escapeHtml(todo.text)}</p>
       </div>
-      <div class="actions">
+      <div class="actions" role="group" aria-label="${escapeHtml(t("todoActionsLabel"))}">
         <button class="secondary" data-action="edit-todo" data-id="${escapeHtml(todo.id)}" aria-label="${escapeHtml(createActionLabel(t("edit"), todo.text))}">${t("edit")}</button>
         <button class="danger" data-action="delete-todo" data-id="${escapeHtml(todo.id)}" aria-label="${escapeHtml(createActionLabel(t("delete"), todo.text))}">${t("delete")}</button>
       </div>
@@ -580,9 +584,9 @@ function getPremiumMessage(status: TrialStatus): string {
 
 function renderSummaryItem(label: string, value: string): string {
   return `
-    <div class="summary-item">
-      <span class="summary-value">${value}</span>
-      <span class="summary-label">${label}</span>
+    <div class="summary-item" role="listitem" aria-label="${escapeHtml(`${label}: ${value}`)}">
+      <span class="summary-value">${escapeHtml(value)}</span>
+      <span class="summary-label">${escapeHtml(label)}</span>
     </div>
   `;
 }

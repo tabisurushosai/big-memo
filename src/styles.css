@@ -13,6 +13,8 @@
   --color-success-hover: #066234;
   --color-danger: #a12635;
   --color-danger-hover: #871e2c;
+  --color-focus-ring: #003b73;
+  --color-focus-inner: #ffffff;
   --radius-lg: 24px;
   --radius-md: 18px;
   --radius-sm: 16px;
@@ -87,9 +89,9 @@ a:focus-visible,
 input:focus-visible,
 textarea:focus-visible,
 .focus-target:focus {
-  outline: 3px solid #ffffff;
-  outline-offset: 2px;
-  box-shadow: 0 0 0 6px #0a5bd7;
+  outline: 3px solid var(--color-focus-inner);
+  outline-offset: 3px;
+  box-shadow: 0 0 0 7px var(--color-focus-ring);
 }
 
 .focus-target {
@@ -491,9 +493,10 @@ textarea {
   align-items: center;
   justify-content: center;
   min-height: 56px;
+  min-width: 56px;
   border: 2px solid #9fc9ef;
   border-radius: var(--radius-sm);
-  padding: 0.7rem 0.9rem;
+  padding: 0.85rem 1rem;
   color: #0f304d;
   background: #e4f1ff;
   font-weight: 900;
@@ -503,7 +506,7 @@ textarea {
 }
 
 .empty-link {
-  justify-self: start;
+  justify-self: stretch;
 }
 
 .sr-only {
