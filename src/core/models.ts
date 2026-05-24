@@ -27,6 +27,12 @@ export type AppData = {
   premium: PremiumState;
 };
 
+export type StoredAppData = {
+  notes?: Note[];
+  todos?: Todo[];
+  premium?: Partial<PremiumState>;
+};
+
 export type TrialStatus = {
   firstLaunchAt: string;
   trialEndsAt: string;

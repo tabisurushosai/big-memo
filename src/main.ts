@@ -41,6 +41,21 @@ let pendingFocusSelectors: string[] = [];
 let statusMessage = "";
 
 type TextEntryElement = HTMLInputElement | HTMLTextAreaElement;
+const ACTIONS = [
+  "toggle-todo",
+  "delete-note",
+  "delete-todo",
+  "edit-note",
+  "edit-todo",
+  "save-note",
+  "save-todo",
+  "cancel-edit",
+  "clear-done",
+] as const;
+type Action = (typeof ACTIONS)[number];
+type FocusAction = Extract<Action, "toggle-todo" | "edit-note" | "edit-todo">;
+const ENTRY_FORM_KINDS = ["note", "todo"] as const;
+type EntryFormKind = (typeof ENTRY_FORM_KINDS)[number];
 
 async function initialize(): Promise<void> {
   renderLoading();
@@ -282,71 +297,102 @@ function renderTodo(todo: Todo): string {
 
 function bindActions(): void {
   document.querySelectorAll<HTMLElement>("[data-action]").forEach((element) => {
-    element.addEventListener("click", async () => {
-      const action = element.dataset["action"];
-      const id = element.dataset["id"];
-
-      if (action === "toggle-todo" && id) {
-        const todo = data.todos.find((item) => item.id === id);
-        statusMessage = todo?.done ? t("todoMarkedUndone") : t("todoMarkedDone");
-        queueFocusAfterRender(
-          `[data-action="toggle-todo"][data-id="${cssEscape(id)}"]`,
-          "#todos-heading",
-        );
-        await mutate((current) => toggleTodo(current, id));
-      }
-      if (action === "delete-note" && id) {
-        statusMessage = t("noteDeleted");
-        queueFocusAfterRender("#notes-heading");
-        await mutate((current) => deleteNote(current, id));
-      }
-      if (action === "delete-todo" && id) {
-        statusMessage = t("todoDeleted");
-        queueFocusAfterRender("#todos-heading");
-        await mutate((current) => deleteTodo(current, id));
-      }
-      if (action === "edit-note" && id) {
-        editingNoteId = id;
-        editingTodoId = null;
-        queueFocusAfterRender(`[data-note-edit="${cssEscape(id)}"]`);
-        render();
-      }
-      if (action === "edit-todo" && id) {
-        editingTodoId = id;
-        editingNoteId = null;
-        queueFocusAfterRender(`[data-todo-edit="${cssEscape(id)}"]`);
-        render();
-      }
-      if (action === "save-note" && id) {
-        const value = getEditableValue(`[data-note-edit="${cssEscape(id)}"]`);
-        editingNoteId = null;
-        statusMessage = hasMeaningfulInput(value) ? t("noteSaved") : t("noteDeleted");
-        queueFocusAfterRender(
-          `[data-action="edit-note"][data-id="${cssEscape(id)}"]`,
-          "#notes-heading",
-        );
-        await mutate((current) => updateNote(current, id, value));
-      }
-      if (action === "save-todo" && id) {
-        const value = getEditableValue(`[data-todo-edit="${cssEscape(id)}"]`);
-        editingTodoId = null;
-        statusMessage = hasMeaningfulInput(value) ? t("todoSaved") : t("todoDeleted");
-        queueFocusAfterRender(
-          `[data-action="edit-todo"][data-id="${cssEscape(id)}"]`,
-          "#todos-heading",
-        );
-        await mutate((current) => updateTodo(current, id, value));
-      }
-      if (action === "cancel-edit") {
-        cancelEditing();
-      }
-      if (action === "clear-done") {
-        statusMessage = t("completedTodosCleared");
-        queueFocusAfterRender("#todos-heading");
-        await mutate((current) => clearCompletedTodaysTodos(current));
-      }
+    element.addEventListener("click", () => {
+      void handleActionClick(element);
     });
   });
+}
+
+async function handleActionClick(element: HTMLElement): Promise<void> {
+  const action = getAction(element);
+  if (!action) {
+    return;
+  }
+
+  const id = element.dataset["id"];
+  switch (action) {
+    case "toggle-todo": {
+      if (!id) {
+        return;
+      }
+
+      const todo = data.todos.find((item) => item.id === id);
+      statusMessage = todo?.done ? t("todoMarkedUndone") : t("todoMarkedDone");
+      queueFocusAfterRender(actionSelector("toggle-todo", id), "#todos-heading");
+      await mutate((current) => toggleTodo(current, id));
+      return;
+    }
+    case "delete-note":
+      if (!id) {
+        return;
+      }
+
+      statusMessage = t("noteDeleted");
+      queueFocusAfterRender("#notes-heading");
+      await mutate((current) => deleteNote(current, id));
+      return;
+    case "delete-todo":
+      if (!id) {
+        return;
+      }
+
+      statusMessage = t("todoDeleted");
+      queueFocusAfterRender("#todos-heading");
+      await mutate((current) => deleteTodo(current, id));
+      return;
+    case "edit-note":
+      if (!id) {
+        return;
+      }
+
+      editingNoteId = id;
+      editingTodoId = null;
+      queueFocusAfterRender(noteEditSelector(id));
+      render();
+      return;
+    case "edit-todo":
+      if (!id) {
+        return;
+      }
+
+      editingTodoId = id;
+      editingNoteId = null;
+      queueFocusAfterRender(todoEditSelector(id));
+      render();
+      return;
+    case "save-note": {
+      if (!id) {
+        return;
+      }
+
+      const value = getEditableValue(noteEditSelector(id));
+      editingNoteId = null;
+      statusMessage = hasMeaningfulInput(value) ? t("noteSaved") : t("noteDeleted");
+      queueFocusAfterRender(actionSelector("edit-note", id), "#notes-heading");
+      await mutate((current) => updateNote(current, id, value));
+      return;
+    }
+    case "save-todo": {
+      if (!id) {
+        return;
+      }
+
+      const value = getEditableValue(todoEditSelector(id));
+      editingTodoId = null;
+      statusMessage = hasMeaningfulInput(value) ? t("todoSaved") : t("todoDeleted");
+      queueFocusAfterRender(actionSelector("edit-todo", id), "#todos-heading");
+      await mutate((current) => updateTodo(current, id, value));
+      return;
+    }
+    case "cancel-edit":
+      cancelEditing();
+      return;
+    case "clear-done":
+      statusMessage = t("completedTodosCleared");
+      queueFocusAfterRender("#todos-heading");
+      await mutate((current) => clearCompletedTodaysTodos(current));
+      return;
+  }
 }
 
 function bindEntryForms(): void {
@@ -354,11 +400,16 @@ function bindEntryForms(): void {
     form.addEventListener("submit", async (event) => {
       event.preventDefault();
 
-      if (form.dataset["entryForm"] === "note") {
-        await submitNote();
-      }
-      if (form.dataset["entryForm"] === "todo") {
-        await submitTodo();
+      const formKind = getEntryFormKind(form);
+      switch (formKind) {
+        case "note":
+          await submitNote();
+          return;
+        case "todo":
+          await submitTodo();
+          return;
+        case null:
+          return;
       }
     });
   });
@@ -367,12 +418,15 @@ function bindEntryForms(): void {
 function bindEditShortcuts(): void {
   document.querySelectorAll<TextEntryElement>(".edit-field").forEach((field) => {
     field.addEventListener("keydown", (event) => {
-      const keyboardEvent = event as KeyboardEvent;
-      if (keyboardEvent.key !== "Escape" || keyboardEvent.isComposing) {
+      if (!(event instanceof KeyboardEvent)) {
         return;
       }
 
-      keyboardEvent.preventDefault();
+      if (event.key !== "Escape" || event.isComposing) {
+        return;
+      }
+
+      event.preventDefault();
       cancelEditing();
     });
   });
@@ -418,10 +472,10 @@ async function submitTodo(): Promise<void> {
 function cancelEditing(): void {
   queueFocusAfterRender(
     ...(editingNoteId
-      ? [`[data-action="edit-note"][data-id="${cssEscape(editingNoteId)}"]`, "#notes-heading"]
+      ? [actionSelector("edit-note", editingNoteId), "#notes-heading"]
       : []),
     ...(editingTodoId
-      ? [`[data-action="edit-todo"][data-id="${cssEscape(editingTodoId)}"]`, "#todos-heading"]
+      ? [actionSelector("edit-todo", editingTodoId), "#todos-heading"]
       : []),
   );
   statusMessage = t("editCancelled");
@@ -446,6 +500,37 @@ function clearInput(id: string): void {
   if (input) {
     input.value = "";
   }
+}
+
+function getAction(element: HTMLElement): Action | null {
+  return getKnownValue(element.dataset["action"], ACTIONS);
+}
+
+function getEntryFormKind(form: HTMLFormElement): EntryFormKind | null {
+  return getKnownValue(form.dataset["entryForm"], ENTRY_FORM_KINDS);
+}
+
+function getKnownValue<TKnownValues extends readonly string[]>(
+  value: string | undefined,
+  knownValues: TKnownValues,
+): TKnownValues[number] | null {
+  if (typeof value === "string" && (knownValues as readonly string[]).includes(value)) {
+    return value as TKnownValues[number];
+  }
+
+  return null;
+}
+
+function actionSelector(action: FocusAction, id: string): string {
+  return `[data-action="${action}"][data-id="${cssEscape(id)}"]`;
+}
+
+function noteEditSelector(id: string): string {
+  return `[data-note-edit="${cssEscape(id)}"]`;
+}
+
+function todoEditSelector(id: string): string {
+  return `[data-todo-edit="${cssEscape(id)}"]`;
 }
 
 function queueFocusAfterRender(...selectors: string[]): void {

@@ -1,5 +1,5 @@
 import { getTodayKey, toIsoString } from "./dates";
-import type { AppData, Note, PremiumState, Todo } from "./models";
+import type { AppData, Note, PremiumState, StoredAppData, Todo } from "./models";
 
 const MAX_NOTE_LENGTH = 500;
 const MAX_TODO_LENGTH = 160;
@@ -9,6 +9,9 @@ type RandomIdSource = {
     randomUUID?: () => string;
   };
 };
+
+type EntryBase = Pick<Note, "id" | "text" | "createdAt" | "updatedAt">;
+type EntryPrefix = "note" | "todo";
 
 export function createEmptyData(now: Date = new Date()): AppData {
   return {
@@ -21,7 +24,7 @@ export function createEmptyData(now: Date = new Date()): AppData {
 }
 
 export function normalizeData(
-  value: Partial<AppData> | undefined,
+  value: StoredAppData | undefined,
   now: Date = new Date(),
 ): AppData {
   const fallback = createEmptyData(now);
@@ -33,18 +36,10 @@ export function normalizeData(
 }
 
 export function addNote(data: AppData, text: string, now: Date = new Date()): AppData {
-  const normalizedText = normalizeText(text, MAX_NOTE_LENGTH);
-  if (!normalizedText) {
+  const note = createEntryBase("note", text, MAX_NOTE_LENGTH, now);
+  if (!note) {
     return data;
   }
-
-  const timestamp = toIsoString(now);
-  const note: Note = {
-    id: createId("note", now),
-    text: normalizedText,
-    createdAt: timestamp,
-    updatedAt: timestamp,
-  };
 
   return {
     ...data,
@@ -79,19 +74,15 @@ export function deleteNote(data: AppData, id: string): AppData {
 }
 
 export function addTodo(data: AppData, text: string, now: Date = new Date()): AppData {
-  const normalizedText = normalizeText(text, MAX_TODO_LENGTH);
-  if (!normalizedText) {
+  const baseTodo = createEntryBase("todo", text, MAX_TODO_LENGTH, now);
+  if (!baseTodo) {
     return data;
   }
 
-  const timestamp = toIsoString(now);
   const todo: Todo = {
-    id: createId("todo", now),
-    text: normalizedText,
+    ...baseTodo,
     date: getTodayKey(now),
     done: false,
-    createdAt: timestamp,
-    updatedAt: timestamp,
   };
 
   return {
@@ -173,7 +164,27 @@ function normalizeText(text: string, maxLength: number): string {
   return text.replace(/\s+/g, " ").trim().slice(0, maxLength);
 }
 
-function createId(prefix: string, now: Date): string {
+function createEntryBase(
+  prefix: EntryPrefix,
+  text: string,
+  maxLength: number,
+  now: Date,
+): EntryBase | null {
+  const normalizedText = normalizeText(text, maxLength);
+  if (!normalizedText) {
+    return null;
+  }
+
+  const timestamp = toIsoString(now);
+  return {
+    id: createId(prefix, now),
+    text: normalizedText,
+    createdAt: timestamp,
+    updatedAt: timestamp,
+  };
+}
+
+function createId(prefix: EntryPrefix, now: Date): string {
   const random =
     (globalThis as RandomIdSource).crypto?.randomUUID?.() ??
     Math.random().toString(36).slice(2, 10);
