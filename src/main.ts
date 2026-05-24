@@ -136,15 +136,16 @@ function render() {
 
     <section class="panel editor" aria-labelledby="editor-heading">
       <h2 id="editor-heading" class="focus-target" tabindex="-1">${t("familyEditor")}</h2>
+      ${isFirstExperience ? `<p class="editor-hint">${t("editorFirstHint")}</p>` : ""}
       <label>
         <span>${t("noteLabel")}</span>
-        <textarea id="note-input" rows="3" maxlength="500"></textarea>
+        <textarea id="note-input" rows="3" maxlength="500" placeholder="${escapeHtml(t("notePlaceholder"))}"></textarea>
       </label>
       <button data-action="add-note">${t("addNote")}</button>
 
       <label>
         <span>${t("todoLabel")}</span>
-        <input id="todo-input" type="text" maxlength="160" />
+        <input id="todo-input" type="text" maxlength="160" placeholder="${escapeHtml(t("todoPlaceholder"))}" />
       </label>
       <button data-action="add-todo">${t("addTodo")}</button>
     </section>
