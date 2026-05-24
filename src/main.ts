@@ -123,6 +123,7 @@ function render(): void {
         <p class="eyebrow">${t("todayDateLabel", { date: formatTodayDate(locale, now) })}</p>
         <h1 id="app-heading">${t("appTitle")}</h1>
         <p class="subtitle">${t("subtitle")}</p>
+        ${isFirstExperience ? `<p class="start-hint">${t("firstStartHint")}</p>` : ""}
       </div>
       <div class="summary-grid" role="list" aria-label="${t("summaryLabel")}">
         ${renderSummaryItem(t("notesCountLabel"), noteCountText)}
