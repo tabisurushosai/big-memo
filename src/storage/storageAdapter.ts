@@ -1,8 +1,7 @@
-import type { AppData } from "../core/models";
+import type { AppData, StoredAppData } from "../core/models";
 
 export const APP_DATA_STORAGE_KEY = "bigMemoAppData";
 
-export type StoredAppData = Partial<AppData>;
 export type StorageKey = string;
 export type StorageValue = unknown;
 
