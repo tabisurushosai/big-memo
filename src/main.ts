@@ -257,8 +257,8 @@ function renderTodo(todo: Todo): string {
 function bindActions() {
   document.querySelectorAll<HTMLElement>("[data-action]").forEach((element) => {
     element.addEventListener("click", async () => {
-      const action = element.dataset.action;
-      const id = element.dataset.id;
+      const action = element.dataset["action"];
+      const id = element.dataset["id"];
 
       if (action === "add-note") {
         await mutate((current) => addNote(current, getInputValue("note-input")));
