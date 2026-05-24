@@ -162,6 +162,14 @@ button.small {
   font-weight: 800;
 }
 
+.guide-tip {
+  border: 1px solid #b6d8f8;
+  border-left: 5px solid var(--color-primary);
+  border-radius: var(--radius-sm);
+  padding: 0.85rem;
+  background: #ffffff;
+}
+
 .status-panel {
   display: grid;
   gap: 0.9rem;
