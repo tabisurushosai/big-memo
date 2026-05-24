@@ -1,6 +1,6 @@
 import { normalizeData } from "../core/memo";
 import type { AppData } from "../core/models";
-import type { AppDataStorageAdapter } from "./storageAdapter";
+import type { AppDataStorageAdapter } from "./appDataStorage";
 
 export class AppRepository {
   constructor(private readonly storage: AppDataStorageAdapter) {}

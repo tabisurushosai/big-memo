@@ -1,5 +1,5 @@
+import { createAppDataStorageAdapter } from "./appDataStorage";
 import {
-  createAppDataStorageAdapter,
   type KeyValueStoragePort,
   type StorageValue,
 } from "./storageAdapter";

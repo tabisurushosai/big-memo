@@ -21,6 +21,7 @@
   },
   "include": [
     "src/core/**/*.ts",
+    "src/storage/appDataStorage.ts",
     "src/storage/appRepository.ts",
     "src/storage/storageAdapter.ts"
   ]
