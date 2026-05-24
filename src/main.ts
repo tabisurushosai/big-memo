@@ -118,6 +118,10 @@ function render(): void {
 
   app.innerHTML = `
     <p class="sr-only" role="status" aria-live="polite" aria-atomic="true">${escapeHtml(announcement)}</p>
+    <nav class="skip-links" aria-label="${escapeHtml(t("skipNavigationLabel"))}">
+      <a class="skip-link" href="#editor-heading">${escapeHtml(t("skipToEditor"))}</a>
+      <a class="skip-link" href="#todos-heading">${escapeHtml(t("skipToTodos"))}</a>
+    </nav>
     <section class="hero">
       <div>
         <p class="eyebrow">${t("todayDateLabel", { date: formatTodayDate(locale, now) })}</p>
@@ -233,10 +237,11 @@ function renderNote(note: Note): string {
     `;
   }
 
+  const noteTextId = `note-text-${note.id}`;
   return `
-    <article class="card" role="listitem">
-      <p class="large-text">${escapeHtml(note.text)}</p>
-      <div class="actions" role="group" aria-label="${escapeHtml(t("noteActionsLabel"))}">
+    <article class="card" role="listitem" aria-labelledby="${escapeHtml(noteTextId)}">
+      <p id="${escapeHtml(noteTextId)}" class="large-text">${escapeHtml(note.text)}</p>
+      <div class="actions" role="group" aria-label="${escapeHtml(t("noteActionsLabel"))}" aria-describedby="${escapeHtml(noteTextId)}">
         <button class="secondary" data-action="edit-note" data-id="${escapeHtml(note.id)}" aria-label="${escapeHtml(createActionLabel(t("edit"), note.text))}">${t("edit")}</button>
         <button class="danger" data-action="delete-note" data-id="${escapeHtml(note.id)}" aria-label="${escapeHtml(createActionLabel(t("delete"), note.text))}">${t("delete")}</button>
       </div>
@@ -283,16 +288,17 @@ function renderTodo(todo: Todo): string {
   }
 
   const doneClass = todo.done ? "done" : "";
+  const todoTextId = `todo-text-${todo.id}`;
   return `
-    <article class="card todo-card ${doneClass}" role="listitem">
-      <button class="check-button" data-action="toggle-todo" data-id="${escapeHtml(todo.id)}" aria-pressed="${todo.done}" aria-label="${escapeHtml(createActionLabel(todo.done ? t("markUndone") : t("markDone"), todo.text))}">
+    <article class="card todo-card ${doneClass}" role="listitem" aria-labelledby="${escapeHtml(todoTextId)}">
+      <button class="check-button" data-action="toggle-todo" data-id="${escapeHtml(todo.id)}" aria-pressed="${todo.done}" aria-describedby="${escapeHtml(todoTextId)}" aria-label="${escapeHtml(createActionLabel(todo.done ? t("markUndone") : t("markDone"), todo.text))}">
         ${todo.done ? t("markUndone") : t("markDone")}
       </button>
       <div class="todo-content">
         ${todo.done ? `<span class="status-badge">${t("completedStatus")}</span>` : ""}
-        <p class="large-text">${escapeHtml(todo.text)}</p>
+        <p id="${escapeHtml(todoTextId)}" class="large-text">${escapeHtml(todo.text)}</p>
       </div>
-      <div class="actions" role="group" aria-label="${escapeHtml(t("todoActionsLabel"))}">
+      <div class="actions" role="group" aria-label="${escapeHtml(t("todoActionsLabel"))}" aria-describedby="${escapeHtml(todoTextId)}">
         <button class="secondary" data-action="edit-todo" data-id="${escapeHtml(todo.id)}" aria-label="${escapeHtml(createActionLabel(t("edit"), todo.text))}">${t("edit")}</button>
         <button class="danger" data-action="delete-todo" data-id="${escapeHtml(todo.id)}" aria-label="${escapeHtml(createActionLabel(t("delete"), todo.text))}">${t("delete")}</button>
       </div>
@@ -370,11 +376,7 @@ async function handleActionClick(element: HTMLElement): Promise<void> {
         return;
       }
 
-      const value = getEditableValue(noteEditSelector(id));
-      editingNoteId = null;
-      statusMessage = hasMeaningfulInput(value) ? t("noteSaved") : t("noteDeleted");
-      queueFocusAfterRender(actionSelector("edit-note", id), "#notes-heading");
-      await mutate((current) => updateNote(current, id, value));
+      await saveNoteEdit(id);
       return;
     }
     case "save-todo": {
@@ -382,11 +384,7 @@ async function handleActionClick(element: HTMLElement): Promise<void> {
         return;
       }
 
-      const value = getEditableValue(todoEditSelector(id));
-      editingTodoId = null;
-      statusMessage = hasMeaningfulInput(value) ? t("todoSaved") : t("todoDeleted");
-      queueFocusAfterRender(actionSelector("edit-todo", id), "#todos-heading");
-      await mutate((current) => updateTodo(current, id, value));
+      await saveTodoEdit(id);
       return;
     }
     case "cancel-edit":
@@ -427,12 +425,20 @@ function bindEditShortcuts(): void {
         return;
       }
 
-      if (event.key !== "Escape" || event.isComposing) {
+      if (event.isComposing) {
         return;
       }
 
-      event.preventDefault();
-      cancelEditing();
+      if (event.key === "Escape") {
+        event.preventDefault();
+        cancelEditing();
+        return;
+      }
+
+      if (event.key === "Enter" && (event.ctrlKey || event.metaKey)) {
+        event.preventDefault();
+        void saveEditFromField(field);
+      }
     });
   });
 }
@@ -487,6 +493,35 @@ function cancelEditing(): void {
   editingNoteId = null;
   editingTodoId = null;
   render();
+}
+
+async function saveEditFromField(field: TextEntryElement): Promise<void> {
+  const noteId = field.dataset["noteEdit"];
+  if (noteId) {
+    await saveNoteEdit(noteId);
+    return;
+  }
+
+  const todoId = field.dataset["todoEdit"];
+  if (todoId) {
+    await saveTodoEdit(todoId);
+  }
+}
+
+async function saveNoteEdit(id: string): Promise<void> {
+  const value = getEditableValue(noteEditSelector(id));
+  editingNoteId = null;
+  statusMessage = hasMeaningfulInput(value) ? t("noteSaved") : t("noteDeleted");
+  queueFocusAfterRender(actionSelector("edit-note", id), "#notes-heading");
+  await mutate((current) => updateNote(current, id, value));
+}
+
+async function saveTodoEdit(id: string): Promise<void> {
+  const value = getEditableValue(todoEditSelector(id));
+  editingTodoId = null;
+  statusMessage = hasMeaningfulInput(value) ? t("todoSaved") : t("todoDeleted");
+  queueFocusAfterRender(actionSelector("edit-todo", id), "#todos-heading");
+  await mutate((current) => updateTodo(current, id, value));
 }
 
 async function mutate(updater: (current: AppData) => AppData): Promise<void> {
