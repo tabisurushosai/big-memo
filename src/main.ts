@@ -584,7 +584,7 @@ function getPremiumMessage(status: TrialStatus): string {
 
 function renderSummaryItem(label: string, value: string): string {
   return `
-    <div class="summary-item" role="listitem" aria-label="${escapeHtml(`${label}: ${value}`)}">
+    <div class="summary-item" role="listitem" aria-label="${escapeHtml(t("summaryItemLabel", { label, value }))}">
       <span class="summary-value">${escapeHtml(value)}</span>
       <span class="summary-label">${escapeHtml(label)}</span>
     </div>
