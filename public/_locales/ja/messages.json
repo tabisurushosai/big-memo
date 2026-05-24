@@ -4,7 +4,7 @@
     "description": "拡張機能名"
   },
   "extDescription": {
-    "message": "家族が書いた大きな文字のメモと今日のやることを見やすく表示します。",
+    "message": "家族が書いたメモと今日のやることを、大きな文字で見やすく表示します。",
     "description": "Chrome Web Store向け説明"
   }
 }

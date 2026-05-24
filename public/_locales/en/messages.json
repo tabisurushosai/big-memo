@@ -4,7 +4,7 @@
     "description": "Extension name"
   },
   "extDescription": {
-    "message": "Displays large, easy-to-read notes and today's to-dos written by family.",
+    "message": "Shows large, easy-to-read family notes and today's to-dos.",
     "description": "Chrome Web Store description"
   }
 }

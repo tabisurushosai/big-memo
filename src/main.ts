@@ -85,6 +85,14 @@ function render() {
   const noteCountText = formatInteger(locale, data.notes.length);
   const remainingTodoCountText = formatInteger(locale, remainingTodoCount);
   const completedTodoCountText = formatInteger(locale, completedTodoCount);
+  const notesHeadingCountText = t(
+    data.notes.length === 1 ? "notesCountTextOne" : "notesCountText",
+    { count: data.notes.length },
+  );
+  const todoProgressText = t(
+    remainingTodoCount === 1 ? "todoProgressOne" : "todoProgress",
+    { done: completedTodoCount, total: todayTodos.length, remaining: remainingTodoCount },
+  );
   const isFirstExperience = data.notes.length === 0 && data.todos.length === 0;
   const announcement = statusMessage;
   statusMessage = "";
@@ -93,7 +101,7 @@ function render() {
     <p class="sr-only" role="status" aria-live="polite" aria-atomic="true">${escapeHtml(announcement)}</p>
     <section class="hero">
       <div>
-        <p class="eyebrow">${t("today")} ${formatTodayDate(locale, now)}</p>
+        <p class="eyebrow">${t("todayDateLabel", { date: formatTodayDate(locale, now) })}</p>
         <h1>${t("appTitle")}</h1>
         <p class="subtitle">${t("subtitle")}</p>
       </div>
@@ -108,7 +116,7 @@ function render() {
 
     <section class="panel" aria-labelledby="notes-heading">
       <div class="section-title">
-        <p class="eyebrow panel-eyebrow">${t("notesCountLabel")} ${noteCountText}</p>
+        <p class="eyebrow panel-eyebrow">${notesHeadingCountText}</p>
         <h2 id="notes-heading" class="focus-target" tabindex="-1">${t("notesTitle")}</h2>
       </div>
       <div class="stack" data-notes></div>
@@ -117,7 +125,7 @@ function render() {
     <section class="panel" aria-labelledby="todos-heading">
       <div class="section-header">
         <div class="section-title">
-          <p class="eyebrow panel-eyebrow">${t("todoProgress", { done: completedTodoCount, total: todayTodos.length, remaining: remainingTodoCount })}</p>
+          <p class="eyebrow panel-eyebrow">${todoProgressText}</p>
           <h2 id="todos-heading" class="focus-target" tabindex="-1">${t("todosTitle")}</h2>
         </div>
         <button class="secondary small" data-action="clear-done" ${completedTodoCount === 0 ? "disabled" : ""}>${t("clearDone")}</button>
@@ -423,7 +431,9 @@ function getPremiumMessage(status: ReturnType<typeof getTrialStatus>): string {
     return t("premiumActive");
   }
   if (status.isTrialActive) {
-    return t("trialActive", { days: status.remainingDays });
+    return t(status.remainingDays === 1 ? "trialActiveOne" : "trialActive", {
+      days: status.remainingDays,
+    });
   }
   return t("trialEnded");
 }
