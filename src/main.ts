@@ -10,7 +10,7 @@ import {
   updateNote,
   updateTodo,
 } from "./core/memo";
-import type { AppData, Note, Todo } from "./core/models";
+import type { AppData, Note, Todo, TrialStatus } from "./core/models";
 import {
   PREMIUM_PRICE_USD,
   getTrialStatus,
@@ -38,13 +38,15 @@ let editingTodoId: string | null = null;
 let pendingFocusSelectors: string[] = [];
 let statusMessage = "";
 
-async function initialize() {
+type TextEntryElement = HTMLInputElement | HTMLTextAreaElement;
+
+async function initialize(): Promise<void> {
   renderLoading();
   data = await repository.load();
   render();
 }
 
-function renderLoading() {
+function renderLoading(): void {
   if (!app) {
     return;
   }
@@ -58,7 +60,7 @@ function renderLoading() {
   `;
 }
 
-function renderError(error: unknown) {
+function renderError(error: unknown): void {
   if (!app) {
     return;
   }
@@ -72,7 +74,7 @@ function renderError(error: unknown) {
   `;
 }
 
-function render() {
+function render(): void {
   if (!app) {
     return;
   }
@@ -167,7 +169,7 @@ function render() {
   focusPendingElement();
 }
 
-function renderNotes() {
+function renderNotes(): void {
   const container = document.querySelector<HTMLDivElement>("[data-notes]");
   if (!container) {
     return;
@@ -214,7 +216,7 @@ function renderNote(note: Note): string {
   `;
 }
 
-function renderTodos(todayTodos: Todo[]) {
+function renderTodos(todayTodos: Todo[]): void {
   const container = document.querySelector<HTMLDivElement>("[data-todos]");
   if (!container) {
     return;
@@ -268,7 +270,7 @@ function renderTodo(todo: Todo): string {
   `;
 }
 
-function bindActions() {
+function bindActions(): void {
   document.querySelectorAll<HTMLElement>("[data-action]").forEach((element) => {
     element.addEventListener("click", async () => {
       const action = element.dataset["action"];
@@ -366,7 +368,7 @@ function bindActions() {
   });
 }
 
-function bindFocusLinks() {
+function bindFocusLinks(): void {
   document.querySelectorAll<HTMLAnchorElement>('a[href^="#"]').forEach((anchor) => {
     anchor.addEventListener("click", (event) => {
       const targetId = anchor.getAttribute("href")?.slice(1);
@@ -383,29 +385,29 @@ function bindFocusLinks() {
   });
 }
 
-async function mutate(updater: (current: AppData) => AppData) {
+async function mutate(updater: (current: AppData) => AppData): Promise<void> {
   data = updater(data);
   await repository.save(data);
   render();
 }
 
 function getInputValue(id: string): string {
-  const input = document.getElementById(id) as HTMLInputElement | HTMLTextAreaElement | null;
+  const input = getTextEntryElementById(id);
   return input?.value ?? "";
 }
 
-function clearInput(id: string) {
-  const input = document.getElementById(id) as HTMLInputElement | HTMLTextAreaElement | null;
+function clearInput(id: string): void {
+  const input = getTextEntryElementById(id);
   if (input) {
     input.value = "";
   }
 }
 
-function queueFocusAfterRender(...selectors: string[]) {
+function queueFocusAfterRender(...selectors: string[]): void {
   pendingFocusSelectors = selectors;
 }
 
-function focusPendingElement() {
+function focusPendingElement(): void {
   if (pendingFocusSelectors.length === 0) {
     return;
   }
@@ -423,11 +425,18 @@ function focusPendingElement() {
 }
 
 function getEditableValue(selector: string): string {
-  const input = document.querySelector<HTMLInputElement | HTMLTextAreaElement>(selector);
+  const input = document.querySelector<TextEntryElement>(selector);
   return input?.value ?? "";
 }
 
-function getPremiumMessage(status: ReturnType<typeof getTrialStatus>): string {
+function getTextEntryElementById(id: string): TextEntryElement | null {
+  const element = document.getElementById(id);
+  return element instanceof HTMLInputElement || element instanceof HTMLTextAreaElement
+    ? element
+    : null;
+}
+
+function getPremiumMessage(status: TrialStatus): string {
   if (status.isPremiumActive) {
     return t("premiumActive");
   }

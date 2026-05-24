@@ -68,8 +68,10 @@ const jaMessages = {
 };
 
 type MessageKey = keyof typeof jaMessages;
+type MessageValues = Record<string, string | number>;
+export type Translator = (key: MessageKey, values?: MessageValues) => string;
 
-const messages: Record<LocaleCode, Record<MessageKey, string>> = {
+const messages = {
   ja: jaMessages,
   en: {
     appTitle: "Big Memo",
@@ -137,7 +139,7 @@ const messages: Record<LocaleCode, Record<MessageKey, string>> = {
     storageOnly: "Content is saved only to this device's storage.",
     offline: "Nothing is sent over the network.",
   },
-};
+} satisfies Record<LocaleCode, Record<MessageKey, string>>;
 
 const LOCALE_TAGS: Record<LocaleCode, string> = {
   ja: "ja-JP",
@@ -185,8 +187,8 @@ export function detectLocale(language: string): LocaleCode {
   return language.toLowerCase().startsWith("en") ? "en" : "ja";
 }
 
-export function createTranslator(locale: LocaleCode) {
-  return (key: MessageKey, values: Record<string, string | number> = {}) => {
+export function createTranslator(locale: LocaleCode): Translator {
+  return (key: MessageKey, values: MessageValues = {}) => {
     let message = messages[locale][key];
     for (const [name, value] of Object.entries(values)) {
       const formattedValue =
