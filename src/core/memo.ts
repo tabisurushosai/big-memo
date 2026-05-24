@@ -159,11 +159,13 @@ function normalizePremium(
   premium: Partial<PremiumState> | undefined,
   fallback: PremiumState,
 ): PremiumState {
+  const purchasedAt = premium?.purchasedAt;
+
   return {
     firstLaunchAt: isValidDateString(premium?.firstLaunchAt)
       ? premium.firstLaunchAt
       : fallback.firstLaunchAt,
-    purchasedAt: isValidDateString(premium?.purchasedAt) ? premium.purchasedAt : undefined,
+    ...(isValidDateString(purchasedAt) ? { purchasedAt } : {}),
   };
 }
 

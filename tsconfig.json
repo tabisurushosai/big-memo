@@ -1,6 +1,8 @@
 {
   "compilerOptions": {
     "target": "ES2021",
+    "allowUnreachableCode": false,
+    "allowUnusedLabels": false,
     "useDefineForClassFields": true,
     "lib": ["DOM", "DOM.Iterable", "ES2021"],
     "allowJs": false,
@@ -8,7 +10,14 @@
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "strict": true,
+    "exactOptionalPropertyTypes": true,
     "forceConsistentCasingInFileNames": true,
+    "noImplicitReturns": true,
+    "noPropertyAccessFromIndexSignature": true,
+    "noUncheckedSideEffectImports": true,
+    "noUncheckedIndexedAccess": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
     "module": "ESNext",
     "moduleResolution": "Bundler",
     "resolveJsonModule": true,
