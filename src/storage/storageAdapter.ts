@@ -1,7 +1,3 @@
-import type { AppData, StoredAppData } from "../core/models";
-
-export const APP_DATA_STORAGE_KEY = "bigMemoAppData";
-
 export type StorageKey = string;
 export type StorageValue = unknown;
 
@@ -15,8 +11,6 @@ export type StorageAdapter<TStored, TWritable = TStored> = {
   save(value: TWritable): Promise<void>;
 };
 
-export type AppDataStorageAdapter = StorageAdapter<StoredAppData, AppData>;
-
 export function createKeyedStorageAdapter<TStored, TWritable = TStored>(
   storage: KeyValueStoragePort,
   key: StorageKey,
@@ -29,13 +23,4 @@ export function createKeyedStorageAdapter<TStored, TWritable = TStored>(
       return storage.set(key, value);
     },
   };
-}
-
-export function createAppDataStorageAdapter(
-  storage: KeyValueStoragePort,
-): AppDataStorageAdapter {
-  return createKeyedStorageAdapter<StoredAppData, AppData>(
-    storage,
-    APP_DATA_STORAGE_KEY,
-  );
 }

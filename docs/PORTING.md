@@ -7,8 +7,11 @@ Android shells.
 
 - `src/core/` contains pure app logic and shared models. It must not import or
   reference `chrome.*`, DOM APIs, extension manifests, or platform storage APIs.
-- `src/storage/` defines the storage interfaces used by the app. Platform code
-  should provide an adapter instead of calling storage APIs from core logic.
+- `src/storage/storageAdapter.ts` defines the generic key/value storage port and
+  keyed adapter helper. It has no Chrome, DOM, or app-model runtime dependency.
+- `src/storage/appDataStorage.ts` binds the generic adapter to the app data key
+  and stored shape. Platform code should provide a key/value implementation
+  instead of calling storage APIs from core logic.
 - `src/platform/` is the place for browser or host-specific helpers such as
   language detection.
 - UI code should receive platform behavior through small adapters and keep the
@@ -24,11 +27,12 @@ The storage layer has two boundaries:
 
 - `KeyValueStoragePort` is the platform boundary. It exposes key-based `get`
   and `set` operations over `unknown` values and is the only place a platform
-  API should be wrapped. Platform adapters should not import app models.
+  API should be wrapped. Implementations should stay small and should not
+  interpret app models.
 - `AppDataStorageAdapter` is the app boundary consumed by `AppRepository`. It
   loads the existing partial stored shape and saves the normalized `AppData`
-  shape without changing the persisted format. The app-data adapter is where
-  the stored value is interpreted as app data.
+  shape without changing the persisted format. `appDataStorage.ts` is where the
+  generic storage port is bound to `bigMemoAppData`.
 
 For a new platform:
 
@@ -40,6 +44,13 @@ For a new platform:
 Chrome uses `chrome.storage.local` only in `src/storage/chromeStorage.ts`. Native
 ports can map the same adapter to their local persistence layer while keeping
 `src/core/` unchanged.
+
+The portable typecheck intentionally includes `src/core/`,
+`src/storage/storageAdapter.ts`, `src/storage/appDataStorage.ts`, and
+`src/storage/appRepository.ts` with Chrome and DOM types disabled. If a future
+change accidentally imports `chrome.*`, `window`, `document`, or another host API
+into those files, `npm run build` should fail before the extension bundle is
+created.
 
 ## iOS and Android shell guidance
 
@@ -58,8 +69,8 @@ ports can map the same adapter to their local persistence layer while keeping
 ## Checks before porting changes
 
 - Run `npm run build`; it includes `tsconfig.portable.json`, which typechecks
-  `src/core/`, `src/storage/storageAdapter.ts`, and
-  `src/storage/appRepository.ts` without Chrome or DOM types.
+  `src/core/`, the generic storage adapter, the app-data adapter, and
+  `AppRepository` without Chrome or DOM types.
 - Keep Manifest V3 permissions unchanged for the extension build unless a
   separate, reviewed change explicitly requires otherwise.
 - Do not add remote code, external CDNs, external fonts, network APIs, or `eval`.
