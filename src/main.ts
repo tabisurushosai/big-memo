@@ -32,6 +32,8 @@ const repository = new AppRepository(chromeAppStorage);
 const locale = detectLocale(getBrowserLanguage());
 const t = createTranslator(locale);
 
+document.documentElement.lang = locale;
+
 let data: AppData;
 let editingNoteId: string | null = null;
 let editingTodoId: string | null = null;
@@ -121,7 +123,7 @@ function render(): void {
         <p class="eyebrow panel-eyebrow">${notesHeadingCountText}</p>
         <h2 id="notes-heading" class="focus-target" tabindex="-1">${t("notesTitle")}</h2>
       </div>
-      <div class="stack" data-notes></div>
+      <div id="notes-list" class="stack" data-notes></div>
     </section>
 
     <section class="panel" aria-labelledby="todos-heading">
@@ -130,26 +132,32 @@ function render(): void {
           <p class="eyebrow panel-eyebrow">${todoProgressText}</p>
           <h2 id="todos-heading" class="focus-target" tabindex="-1">${t("todosTitle")}</h2>
         </div>
-        <button class="secondary small" data-action="clear-done" ${completedTodoCount === 0 ? "disabled" : ""}>${t("clearDone")}</button>
+        <button class="secondary small" data-action="clear-done" aria-controls="todos-list" ${completedTodoCount === 0 ? "disabled" : ""}>${t("clearDone")}</button>
       </div>
       ${todayTodos.length > 0 && remainingTodoCount === 0 ? `<p class="done-message" role="status">${t("allTodosDone")}</p>` : ""}
-      <div class="stack" data-todos></div>
+      <div id="todos-list" class="stack" data-todos></div>
     </section>
 
     <section class="panel editor" aria-labelledby="editor-heading">
       <h2 id="editor-heading" class="focus-target" tabindex="-1">${t("familyEditor")}</h2>
       ${isFirstExperience ? `<p class="editor-hint">${t("editorFirstHint")}</p>` : ""}
-      <label>
-        <span>${t("noteLabel")}</span>
-        <textarea id="note-input" rows="3" maxlength="500" placeholder="${escapeHtml(t("notePlaceholder"))}"></textarea>
-      </label>
-      <button data-action="add-note">${t("addNote")}</button>
+      <form class="entry-form" data-entry-form="note" aria-describedby="note-input-help">
+        <label for="note-input">
+          <span>${t("noteLabel")}</span>
+        </label>
+        <textarea id="note-input" rows="3" maxlength="500" placeholder="${escapeHtml(t("notePlaceholder"))}" aria-describedby="note-input-help"></textarea>
+        <p id="note-input-help" class="field-help">${t("noteInputHelp")}</p>
+        <button type="submit" aria-controls="notes-list">${t("addNote")}</button>
+      </form>
 
-      <label>
-        <span>${t("todoLabel")}</span>
-        <input id="todo-input" type="text" maxlength="160" placeholder="${escapeHtml(t("todoPlaceholder"))}" />
-      </label>
-      <button data-action="add-todo">${t("addTodo")}</button>
+      <form class="entry-form" data-entry-form="todo" aria-describedby="todo-input-help">
+        <label for="todo-input">
+          <span>${t("todoLabel")}</span>
+        </label>
+        <input id="todo-input" type="text" maxlength="160" placeholder="${escapeHtml(t("todoPlaceholder"))}" aria-describedby="todo-input-help" />
+        <p id="todo-input-help" class="field-help">${t("todoInputHelp")}</p>
+        <button type="submit" aria-controls="todos-list">${t("addTodo")}</button>
+      </form>
     </section>
 
     <section class="panel premium" aria-labelledby="premium-heading">
@@ -164,7 +172,9 @@ function render(): void {
 
   renderNotes();
   renderTodos(todayTodos);
+  bindEntryForms();
   bindActions();
+  bindEditShortcuts();
   bindFocusLinks();
   focusPendingElement();
 }
@@ -276,24 +286,6 @@ function bindActions(): void {
       const action = element.dataset["action"];
       const id = element.dataset["id"];
 
-      if (action === "add-note") {
-        const value = getInputValue("note-input");
-        if (hasMeaningfulInput(value)) {
-          statusMessage = t("noteAdded");
-        }
-        queueFocusAfterRender("#note-input");
-        await mutate((current) => addNote(current, value));
-        clearInput("note-input");
-      }
-      if (action === "add-todo") {
-        const value = getInputValue("todo-input");
-        if (hasMeaningfulInput(value)) {
-          statusMessage = t("todoAdded");
-        }
-        queueFocusAfterRender("#todo-input");
-        await mutate((current) => addTodo(current, value));
-        clearInput("todo-input");
-      }
       if (action === "toggle-todo" && id) {
         const todo = data.todos.find((item) => item.id === id);
         statusMessage = todo?.done ? t("todoMarkedUndone") : t("todoMarkedDone");
@@ -346,24 +338,42 @@ function bindActions(): void {
         await mutate((current) => updateTodo(current, id, value));
       }
       if (action === "cancel-edit") {
-        queueFocusAfterRender(
-          ...(editingNoteId
-            ? [`[data-action="edit-note"][data-id="${cssEscape(editingNoteId)}"]`, "#notes-heading"]
-            : []),
-          ...(editingTodoId
-            ? [`[data-action="edit-todo"][data-id="${cssEscape(editingTodoId)}"]`, "#todos-heading"]
-            : []),
-        );
-        statusMessage = t("editCancelled");
-        editingNoteId = null;
-        editingTodoId = null;
-        render();
+        cancelEditing();
       }
       if (action === "clear-done") {
         statusMessage = t("completedTodosCleared");
         queueFocusAfterRender("#todos-heading");
         await mutate((current) => clearCompletedTodaysTodos(current));
       }
+    });
+  });
+}
+
+function bindEntryForms(): void {
+  document.querySelectorAll<HTMLFormElement>("[data-entry-form]").forEach((form) => {
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+
+      if (form.dataset["entryForm"] === "note") {
+        await submitNote();
+      }
+      if (form.dataset["entryForm"] === "todo") {
+        await submitTodo();
+      }
+    });
+  });
+}
+
+function bindEditShortcuts(): void {
+  document.querySelectorAll<TextEntryElement>(".edit-field").forEach((field) => {
+    field.addEventListener("keydown", (event) => {
+      const keyboardEvent = event as KeyboardEvent;
+      if (keyboardEvent.key !== "Escape" || keyboardEvent.isComposing) {
+        return;
+      }
+
+      keyboardEvent.preventDefault();
+      cancelEditing();
     });
   });
 }
@@ -383,6 +393,41 @@ function bindFocusLinks(): void {
       target.focus();
     });
   });
+}
+
+async function submitNote(): Promise<void> {
+  const value = getInputValue("note-input");
+  if (hasMeaningfulInput(value)) {
+    statusMessage = t("noteAdded");
+  }
+  queueFocusAfterRender("#note-input");
+  await mutate((current) => addNote(current, value));
+  clearInput("note-input");
+}
+
+async function submitTodo(): Promise<void> {
+  const value = getInputValue("todo-input");
+  if (hasMeaningfulInput(value)) {
+    statusMessage = t("todoAdded");
+  }
+  queueFocusAfterRender("#todo-input");
+  await mutate((current) => addTodo(current, value));
+  clearInput("todo-input");
+}
+
+function cancelEditing(): void {
+  queueFocusAfterRender(
+    ...(editingNoteId
+      ? [`[data-action="edit-note"][data-id="${cssEscape(editingNoteId)}"]`, "#notes-heading"]
+      : []),
+    ...(editingTodoId
+      ? [`[data-action="edit-todo"][data-id="${cssEscape(editingTodoId)}"]`, "#todos-heading"]
+      : []),
+  );
+  statusMessage = t("editCancelled");
+  editingNoteId = null;
+  editingTodoId = null;
+  render();
 }
 
 async function mutate(updater: (current: AppData) => AppData): Promise<void> {
