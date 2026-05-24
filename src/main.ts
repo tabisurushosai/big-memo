@@ -84,6 +84,7 @@ function render() {
   const noteCountText = formatInteger(locale, data.notes.length);
   const remainingTodoCountText = formatInteger(locale, remainingTodoCount);
   const completedTodoCountText = formatInteger(locale, completedTodoCount);
+  const isFirstExperience = data.notes.length === 0 && data.todos.length === 0;
 
   app.innerHTML = `
     <section class="hero">
@@ -98,6 +99,8 @@ function render() {
         ${renderSummaryItem(t("completedTodosLabel"), completedTodoCountText)}
       </div>
     </section>
+
+    ${isFirstExperience ? renderFirstGuide() : ""}
 
     <section class="panel" aria-labelledby="notes-heading">
       <div class="section-title">
@@ -159,7 +162,12 @@ function renderNotes() {
   if (data.notes.length === 0) {
     container.removeAttribute("role");
     container.removeAttribute("aria-label");
-    container.innerHTML = renderEmptyState(t("emptyNotes"), t("emptyNotesDetail"));
+    container.innerHTML = renderEmptyState(
+      t("emptyNotes"),
+      t("emptyNotesDetail"),
+      "#note-input",
+      t("emptyNotesAction"),
+    );
     return;
   }
 
@@ -201,7 +209,12 @@ function renderTodos(todayTodos: Todo[]) {
   if (todayTodos.length === 0) {
     container.removeAttribute("role");
     container.removeAttribute("aria-label");
-    container.innerHTML = renderEmptyState(t("emptyTodos"), t("emptyTodosDetail"));
+    container.innerHTML = renderEmptyState(
+      t("emptyTodos"),
+      t("emptyTodosDetail"),
+      "#todo-input",
+      t("emptyTodosAction"),
+    );
     return;
   }
 
@@ -351,11 +364,31 @@ function renderSummaryItem(label: string, value: string): string {
   `;
 }
 
-function renderEmptyState(title: string, detail: string): string {
+function renderFirstGuide(): string {
+  return `
+    <section class="panel first-guide" aria-labelledby="first-guide-heading">
+      <p class="eyebrow panel-eyebrow">${t("firstGuideEyebrow")}</p>
+      <h2 id="first-guide-heading">${t("firstGuideTitle")}</h2>
+      <p>${t("firstGuideDetail")}</p>
+      <div class="guide-actions">
+        <a class="guide-link guide-link-primary" href="#note-input">${t("firstGuideNoteAction")}</a>
+        <a class="guide-link" href="#todo-input">${t("firstGuideTodoAction")}</a>
+      </div>
+    </section>
+  `;
+}
+
+function renderEmptyState(
+  title: string,
+  detail: string,
+  actionHref: string,
+  actionLabel: string,
+): string {
   return `
     <div class="empty-state">
       <p class="empty-title">${title}</p>
       <p class="empty-detail">${detail}</p>
+      <a class="empty-link" href="${escapeHtml(actionHref)}">${actionLabel}</a>
     </div>
   `;
 }

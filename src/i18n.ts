@@ -14,10 +14,17 @@ type MessageKey =
   | "save"
   | "cancel"
   | "delete"
+  | "firstGuideEyebrow"
+  | "firstGuideTitle"
+  | "firstGuideDetail"
+  | "firstGuideNoteAction"
+  | "firstGuideTodoAction"
   | "emptyNotes"
   | "emptyNotesDetail"
+  | "emptyNotesAction"
   | "emptyTodos"
   | "emptyTodosDetail"
+  | "emptyTodosAction"
   | "loading"
   | "loadError"
   | "completedStatus"
@@ -56,10 +63,18 @@ const messages: Record<LocaleCode, Record<MessageKey, string>> = {
     save: "保存",
     cancel: "キャンセル",
     delete: "削除",
+    firstGuideEyebrow: "はじめての使い方",
+    firstGuideTitle: "まずは1つだけ書けば大丈夫です。",
+    firstGuideDetail:
+      "下の入力欄に、家族へ見せたい一言か今日の用事を入れると、ここに大きく表示されます。",
+    firstGuideNoteAction: "メモを書く",
+    firstGuideTodoAction: "やることを書く",
     emptyNotes: "まだメモはありません。",
     emptyNotesDetail: "家族用の入力欄から、表示したいメモを追加できます。",
+    emptyNotesAction: "メモ入力欄へ",
     emptyTodos: "今日のやることはありません。",
     emptyTodosDetail: "今日だけ表示したい予定や用事を追加できます。",
+    emptyTodosAction: "やること入力欄へ",
     loading: "読み込み中です。",
     loadError: "読み込みに失敗しました。",
     completedStatus: "完了",
@@ -97,10 +112,18 @@ const messages: Record<LocaleCode, Record<MessageKey, string>> = {
     save: "Save",
     cancel: "Cancel",
     delete: "Delete",
+    firstGuideEyebrow: "Getting started",
+    firstGuideTitle: "Start with just one item.",
+    firstGuideDetail:
+      "Use the input area below to add a note for family or one task for today, and it will appear here in large text.",
+    firstGuideNoteAction: "Write a note",
+    firstGuideTodoAction: "Add a to-do",
     emptyNotes: "No notes yet.",
     emptyNotesDetail: "Use the family input area to add a note to display here.",
+    emptyNotesAction: "Go to note input",
     emptyTodos: "No to-dos for today.",
     emptyTodosDetail: "Add appointments or tasks that should appear today.",
+    emptyTodosAction: "Go to to-do input",
     loading: "Loading.",
     loadError: "Could not load data.",
     completedStatus: "Completed",
