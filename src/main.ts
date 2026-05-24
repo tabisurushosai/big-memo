@@ -118,7 +118,7 @@ function render() {
         </div>
         <button class="secondary small" data-action="clear-done" ${completedTodoCount === 0 ? "disabled" : ""}>${t("clearDone")}</button>
       </div>
-      ${todayTodos.length > 0 && remainingTodoCount === 0 ? `<p class="done-message">${t("allTodosDone")}</p>` : ""}
+      ${todayTodos.length > 0 && remainingTodoCount === 0 ? `<p class="done-message" role="status">${t("allTodosDone")}</p>` : ""}
       <div class="stack" data-todos></div>
     </section>
 
@@ -385,7 +385,7 @@ function renderEmptyState(
   actionLabel: string,
 ): string {
   return `
-    <div class="empty-state">
+    <div class="empty-state" role="status">
       <p class="empty-title">${title}</p>
       <p class="empty-detail">${detail}</p>
       <a class="empty-link" href="${escapeHtml(actionHref)}">${actionLabel}</a>
