@@ -3,6 +3,7 @@ import type { LocaleCode } from "./core/models";
 const jaMessages = {
   appTitle: "おおきなメモ",
   subtitle: "家族が残したメモと今日のやることを、大きな文字で見やすく表示します。",
+  firstStartHint: "はじめに、下の入力欄でメモかやることを1つ追加します。",
   notesTitle: "今日のメモ",
   todosTitle: "今日のやること",
   familyEditor: "家族が入力する欄",
@@ -86,6 +87,7 @@ const messages = {
   en: {
     appTitle: "Big Memo",
     subtitle: "Displays family notes and today's to-dos in large, easy-to-read text.",
+    firstStartHint: "To start, add one note or to-do in the entry area below.",
     notesTitle: "Today's notes",
     todosTitle: "Today's to-dos",
     familyEditor: "Family input area",

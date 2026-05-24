@@ -242,6 +242,17 @@ h2 {
   max-width: 32rem;
 }
 
+.start-hint {
+  margin: 0.85rem 0 0;
+  border: 1px solid rgb(255 255 255 / 38%);
+  border-left-width: 5px;
+  border-radius: var(--radius-sm);
+  padding: 0.85rem;
+  color: #ffffff;
+  background: rgb(255 255 255 / 16%);
+  font-weight: 850;
+}
+
 .large-text {
   margin-bottom: 0;
 }
