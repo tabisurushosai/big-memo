@@ -1,4 +1,5 @@
 import { normalizeData } from "../core/memo";
+import { isRecord } from "../core/guards";
 import type { AppData } from "../core/models";
 import type { AppDataStorageAdapter } from "./appDataStorage";
 
@@ -9,7 +10,7 @@ export class AppRepository {
     const stored = await this.storage.load();
     const data = normalizeData(stored);
 
-    if (!stored?.premium?.firstLaunchAt) {
+    if (!hasStoredFirstLaunchAt(stored)) {
       await this.save(data);
     }
 
@@ -19,4 +20,12 @@ export class AppRepository {
   async save(data: AppData): Promise<void> {
     await this.storage.save(data);
   }
+}
+
+function hasStoredFirstLaunchAt(value: unknown): boolean {
+  if (!isRecord(value) || !isRecord(value["premium"])) {
+    return false;
+  }
+
+  return Boolean(value["premium"]["firstLaunchAt"]);
 }

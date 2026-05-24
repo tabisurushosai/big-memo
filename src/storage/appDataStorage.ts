@@ -1,19 +1,17 @@
-import type { AppData, StoredAppData } from "../core/models";
+import type { AppData } from "../core/models";
 import {
   createKeyedStorageAdapter,
   type KeyValueStoragePort,
+  type StorageValue,
   type StorageAdapter,
 } from "./storageAdapter";
 
 export const APP_DATA_STORAGE_KEY = "bigMemoAppData";
 
-export type AppDataStorageAdapter = StorageAdapter<StoredAppData, AppData>;
+export type AppDataStorageAdapter = StorageAdapter<StorageValue, AppData>;
 
 export function createAppDataStorageAdapter(
   storage: KeyValueStoragePort,
 ): AppDataStorageAdapter {
-  return createKeyedStorageAdapter<StoredAppData, AppData>(
-    storage,
-    APP_DATA_STORAGE_KEY,
-  );
+  return createKeyedStorageAdapter<AppData>(storage, APP_DATA_STORAGE_KEY);
 }
