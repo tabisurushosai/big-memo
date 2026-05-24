@@ -61,6 +61,7 @@ button:disabled {
 }
 
 button:focus-visible,
+a:focus-visible,
 input:focus-visible,
 textarea:focus-visible {
   outline: 3px solid #ffffff;
@@ -117,6 +118,23 @@ button.small {
 
 .panel {
   padding: 1.1rem;
+}
+
+.first-guide {
+  display: grid;
+  gap: 0.8rem;
+  border-color: #9fc9ef;
+  background: #f2f8ff;
+}
+
+.first-guide h2,
+.first-guide p {
+  margin-bottom: 0;
+}
+
+.first-guide p:not(.eyebrow) {
+  color: #263f56;
+  font-weight: 800;
 }
 
 .status-panel {
@@ -348,6 +366,43 @@ textarea {
 .empty-detail {
   margin-bottom: 0;
   color: #52616f;
+}
+
+.guide-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.guide-link,
+.empty-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  border: 2px solid #9fc9ef;
+  border-radius: 16px;
+  padding: 0.7rem 0.9rem;
+  color: #0f304d;
+  background: #e4f1ff;
+  font-weight: 900;
+  text-align: center;
+  text-decoration: none;
+}
+
+.guide-link-primary {
+  color: #ffffff;
+  background: #075ea8;
+  border-color: #075ea8;
+}
+
+.guide-link:hover,
+.empty-link:hover {
+  background: #d4e9ff;
+}
+
+.guide-link-primary:hover {
+  background: #064f8f;
 }
 
 .loading-bar {
