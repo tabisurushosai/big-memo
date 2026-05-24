@@ -38,10 +38,10 @@ const jaMessages = {
   notesCountLabel: "メモ",
   remainingTodosLabel: "残り",
   completedTodosLabel: "完了",
-  notesCountText: "メモ {count}件",
-  notesCountTextOne: "メモ {count}件",
-  todoProgress: "{done}/{total}件完了。残り{remaining}件です。",
-  todoProgressOne: "{done}/{total}件完了。残り{remaining}件です。",
+  notesCountText: "メモ：{count}件",
+  notesCountTextOne: "メモ：{count}件",
+  todoProgress: "{total}件中{done}件完了。残り{remaining}件です。",
+  todoProgressOne: "{total}件中{done}件完了。残り{remaining}件です。",
   allTodosDone: "今日のやることはすべて完了です。",
   markDone: "完了にする",
   markUndone: "未完了に戻す",
@@ -63,8 +63,9 @@ const jaMessages = {
   trialEnded: "7日間のトライアルは終了しました。",
   basicStillWorks: "トライアル後も、基本のメモと今日のやることは使えます。",
   paymentUnavailable: "決済リンクは未設定です。",
-  price: "買い切り: {price}",
-  todayDateLabel: "今日: {date}",
+  price: "買い切り：{price}",
+  todayDateLabel: "今日：{date}",
+  actionTargetLabel: "{target}：{action}",
   storageOnly: "内容はこの端末の保存領域だけに保存されます。",
   offline: "ネットワークには送信しません。",
 };
@@ -115,8 +116,8 @@ const messages = {
     completedTodosLabel: "Completed",
     notesCountText: "{count} notes",
     notesCountTextOne: "{count} note",
-    todoProgress: "{done} of {total} completed. {remaining} to-dos remaining.",
-    todoProgressOne: "{done} of {total} completed. {remaining} to-do remaining.",
+    todoProgress: "Tasks completed: {done} of {total}. {remaining} to-dos remaining.",
+    todoProgressOne: "Tasks completed: {done} of {total}. {remaining} to-do remaining.",
     allTodosDone: "Everything for today is complete.",
     markDone: "Mark as done",
     markUndone: "Mark as not done",
@@ -139,7 +140,8 @@ const messages = {
     basicStillWorks: "Basic notes and today's to-dos still work after the trial.",
     paymentUnavailable: "Payment link is not configured.",
     price: "One-time purchase: {price}",
-    todayDateLabel: "Today, {date}",
+    todayDateLabel: "Today: {date}",
+    actionTargetLabel: "{action}: {target}",
     storageOnly: "Content is saved only to this device's storage.",
     offline: "Nothing is sent over the network.",
   },
@@ -151,8 +153,14 @@ const LOCALE_TAGS: Record<LocaleCode, string> = {
 };
 
 const INTEGER_FORMATTERS: Record<LocaleCode, Intl.NumberFormat> = {
-  ja: new Intl.NumberFormat(LOCALE_TAGS.ja, { maximumFractionDigits: 0 }),
-  en: new Intl.NumberFormat(LOCALE_TAGS.en, { maximumFractionDigits: 0 }),
+  ja: new Intl.NumberFormat(LOCALE_TAGS.ja, {
+    maximumFractionDigits: 0,
+    useGrouping: true,
+  }),
+  en: new Intl.NumberFormat(LOCALE_TAGS.en, {
+    maximumFractionDigits: 0,
+    useGrouping: true,
+  }),
 };
 
 const USD_FORMATTERS: Record<LocaleCode, Intl.NumberFormat> = {
