@@ -1,20 +1,29 @@
 export type StorageKey = string;
 export type StorageValue = unknown;
 
-export type KeyValueStoragePort = {
-  get(key: StorageKey): Promise<StorageValue | undefined>;
-  set(key: StorageKey, value: StorageValue): Promise<void>;
+export type KeyValueStoragePort<
+  TStoredValue = StorageValue,
+  TWritableValue = TStoredValue,
+> = {
+  get(key: StorageKey): Promise<TStoredValue | undefined>;
+  set(key: StorageKey, value: TWritableValue): Promise<void>;
 };
 
-export type StorageAdapter<TStored, TWritable = TStored> = {
-  load(): Promise<TStored | undefined>;
-  save(value: TWritable): Promise<void>;
+export type StorageAdapter<
+  TStoredValue = StorageValue,
+  TWritableValue = TStoredValue,
+> = {
+  load(): Promise<TStoredValue | undefined>;
+  save(value: TWritableValue): Promise<void>;
 };
 
-export function createKeyedStorageAdapter<TWritable = StorageValue>(
-  storage: KeyValueStoragePort,
+export function createKeyedStorageAdapter<
+  TStoredValue = StorageValue,
+  TWritableValue = TStoredValue,
+>(
+  storage: KeyValueStoragePort<TStoredValue, TWritableValue>,
   key: StorageKey,
-): StorageAdapter<StorageValue, TWritable> {
+): StorageAdapter<TStoredValue, TWritableValue> {
   return {
     async load() {
       return storage.get(key);
