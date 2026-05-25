@@ -629,10 +629,11 @@ function renderSummaryItem(label: string, value: string): string {
 
 function renderFirstGuide(): string {
   return `
-    <section class="panel first-guide" aria-labelledby="first-guide-heading">
+    <section class="panel first-guide" aria-labelledby="first-guide-heading" aria-describedby="first-guide-tip first-guide-route">
       <p class="eyebrow panel-eyebrow">${t("firstGuideEyebrow")}</p>
       <h2 id="first-guide-heading">${t("firstGuideTitle")}</h2>
-      <p class="guide-tip">${t("firstGuideTip")}</p>
+      <p id="first-guide-tip" class="guide-tip">${t("firstGuideTip")}</p>
+      <p id="first-guide-route" class="guide-route">${t("firstGuideRoute")}</p>
       <p>${t("firstGuideDetail")}</p>
       <div class="guide-actions">
         <a class="guide-link guide-link-primary" href="#note-input">${t("firstGuideNoteAction")}</a>
