@@ -420,11 +420,7 @@ function bindEntryForms(): void {
 
 function bindEditShortcuts(): void {
   document.querySelectorAll<TextEntryElement>(".edit-field").forEach((field) => {
-    field.addEventListener("keydown", (event) => {
-      if (!(event instanceof KeyboardEvent)) {
-        return;
-      }
-
+    addKeydownListener(field, (event) => {
       if (event.isComposing) {
         return;
       }
@@ -441,6 +437,19 @@ function bindEditShortcuts(): void {
       }
     });
   });
+}
+
+function addKeydownListener(
+  field: TextEntryElement,
+  listener: (event: KeyboardEvent) => void,
+): void {
+  const eventListener: EventListener = (event) => {
+    if (event instanceof KeyboardEvent) {
+      listener(event);
+    }
+  };
+
+  field.addEventListener("keydown", eventListener);
 }
 
 function bindFocusLinks(): void {
@@ -550,15 +559,11 @@ function getEntryFormKind(form: HTMLFormElement): EntryFormKind | null {
   return getKnownValue(form.dataset["entryForm"], ENTRY_FORM_KINDS);
 }
 
-function getKnownValue<TKnownValues extends readonly string[]>(
+function getKnownValue<TKnownValue extends string>(
   value: string | undefined,
-  knownValues: TKnownValues,
-): TKnownValues[number] | null {
-  if (typeof value === "string" && (knownValues as readonly string[]).includes(value)) {
-    return value as TKnownValues[number];
-  }
-
-  return null;
+  knownValues: readonly TKnownValue[],
+): TKnownValue | null {
+  return knownValues.find((knownValue) => knownValue === value) ?? null;
 }
 
 function actionSelector(action: FocusAction, id: string): string {

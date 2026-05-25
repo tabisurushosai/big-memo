@@ -13,11 +13,7 @@ type RandomIdSource = {
 
 type EntryBase = Pick<Note, "id" | "text" | "createdAt" | "updatedAt">;
 type EntryPrefix = "note" | "todo";
-type StoredAppData = {
-  notes?: unknown;
-  todos?: unknown;
-  premium?: unknown;
-};
+type StoredAppData = Partial<Record<keyof AppData, unknown>>;
 
 export function createEmptyData(now: Date = new Date()): AppData {
   return {
