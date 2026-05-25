@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "build": "tsc -p tsconfig.portable.json && tsc --noEmit && vite build",
+    "lint": "npm run typecheck",
     "typecheck": "tsc -p tsconfig.portable.json && tsc --noEmit"
   },
   "devDependencies": {
