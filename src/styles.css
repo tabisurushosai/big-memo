@@ -216,6 +216,12 @@ button.small {
   background: #ffffff;
 }
 
+.guide-route {
+  border-radius: var(--radius-sm);
+  padding: 0.75rem 0.85rem;
+  background: #e4f1ff;
+}
+
 .status-panel {
   display: grid;
   gap: 0.9rem;
