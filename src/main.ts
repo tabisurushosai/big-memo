@@ -120,6 +120,7 @@ function render(): void {
     <p class="sr-only" role="status" aria-live="polite" aria-atomic="true">${escapeHtml(announcement)}</p>
     <nav class="skip-links" aria-label="${escapeHtml(t("skipNavigationLabel"))}">
       <a class="skip-link" href="#editor-heading">${escapeHtml(t("skipToEditor"))}</a>
+      <a class="skip-link" href="#notes-heading">${escapeHtml(t("skipToNotes"))}</a>
       <a class="skip-link" href="#todos-heading">${escapeHtml(t("skipToTodos"))}</a>
     </nav>
     <section class="hero">
@@ -227,7 +228,7 @@ function renderNote(note: Note): string {
     const editHelpId = `note-edit-help-${note.id}`;
     return `
       <article class="card" role="listitem">
-        <textarea class="edit-field" data-note-edit="${escapeHtml(note.id)}" rows="4" maxlength="500" aria-label="${escapeHtml(t("noteLabel"))}" aria-describedby="${escapeHtml(editHelpId)}">${escapeHtml(note.text)}</textarea>
+        <textarea class="edit-field" data-note-edit="${escapeHtml(note.id)}" rows="4" maxlength="500" aria-label="${escapeHtml(t("noteLabel"))}" aria-describedby="${escapeHtml(editHelpId)}" aria-keyshortcuts="Escape Control+Enter Meta+Enter">${escapeHtml(note.text)}</textarea>
         <p id="${escapeHtml(editHelpId)}" class="sr-only">${t("editKeyboardHelp")}</p>
         <div class="actions" role="group" aria-label="${escapeHtml(t("editActionsLabel"))}">
           <button data-action="save-note" data-id="${escapeHtml(note.id)}">${t("save")}</button>
@@ -277,7 +278,7 @@ function renderTodo(todo: Todo): string {
     const editHelpId = `todo-edit-help-${todo.id}`;
     return `
       <article class="card todo-card" role="listitem">
-        <input class="edit-field" data-todo-edit="${escapeHtml(todo.id)}" type="text" maxlength="160" value="${escapeHtml(todo.text)}" aria-label="${escapeHtml(t("todoLabel"))}" aria-describedby="${escapeHtml(editHelpId)}" />
+        <input class="edit-field" data-todo-edit="${escapeHtml(todo.id)}" type="text" maxlength="160" value="${escapeHtml(todo.text)}" aria-label="${escapeHtml(t("todoLabel"))}" aria-describedby="${escapeHtml(editHelpId)}" aria-keyshortcuts="Escape Control+Enter Meta+Enter" />
         <p id="${escapeHtml(editHelpId)}" class="sr-only">${t("editKeyboardHelp")}</p>
         <div class="actions" role="group" aria-label="${escapeHtml(t("editActionsLabel"))}">
           <button data-action="save-todo" data-id="${escapeHtml(todo.id)}">${t("save")}</button>
