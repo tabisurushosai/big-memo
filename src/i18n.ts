@@ -31,6 +31,7 @@ const jaMessages = {
   firstGuideTodoAction: "やること入力欄へ",
   skipNavigationLabel: "キーボード移動",
   skipToEditor: "入力欄へ移動",
+  skipToNotes: "メモ一覧へ移動",
   skipToTodos: "やること一覧へ移動",
   emptyNotes: "まだメモはありません。",
   emptyNotesDetail:
@@ -122,6 +123,7 @@ const messages = {
     firstGuideTodoAction: "Go to to-do input",
     skipNavigationLabel: "Keyboard navigation",
     skipToEditor: "Skip to input area",
+    skipToNotes: "Skip to notes list",
     skipToTodos: "Skip to to-do list",
     emptyNotes: "No notes yet.",
     emptyNotesDetail:
